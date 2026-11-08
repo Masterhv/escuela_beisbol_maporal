@@ -1,0 +1,80 @@
+RewriteEngine On
+
+# Permitir acceso directo a archivos estáticos en views/assets/ (en cualquier ruta de instalación: raíz o subcarpeta)
+RewriteCond %{REQUEST_URI} /views/assets/
+RewriteRule ^(.*)$ - [L]
+
+# --- Archivos y carpetas que NUNCA deben servirse por URL ---------------------------------------------------------
+# Codigo, configuracion con credenciales, base de datos y documentacion interna. Se bloquea por carpeta y por tipo, no
+# archivo a archivo: asi un archivo nuevo (p. ej. config/app.php) queda protegido sin acordarse de añadirlo, y sigue
+# protegido aunque PHP dejara de interpretarse por una avería del servidor (que serviría el código como texto).
+# Los PDF y reportes se entregan siempre desde un controlador, nunca como archivo estatico.
+RewriteRule ^(config|models|controllers|services|database|vendor)(/|$) - [F,L]
+RewriteRule ^views/(?!assets/) - [F,L]
+# Fotos de atletas (menores de edad): NO se sirven por URL. Se entregan por athletes/photo?id=N, que exige sesion y respeta el
+# alcance del usuario (un representante solo ve las de sus atletas). El logo y demas imagenes de img/ siguen siendo publicos.
+RewriteRule ^(?:.*/)?img/atleta_[^/]*$ - [F,L]
+RewriteRule ^(composer\.(json|lock)|package(-lock)?\.json|\.gitignore|\.git(/.*)?|\.env.*|.*\.(md|sql|log|bak|dist|example\.php|ini|sh|ps1))$ - [F,L]
+
+# Redirigir todas las solicitudes al index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Configuraciones de seguridad
+<Files "*.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Proteger archivos de configuración
+<Files "config.php">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Proteger archivos de base de datos
+<Files "*.sql">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Configurar tipos MIME
+AddType application/x-httpd-php .php
+
+# Configurar caché para archivos estáticos
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/ico "access plus 1 month"
+    ExpiresByType image/icon "access plus 1 month"
+    ExpiresByType text/x-icon "access plus 1 month"
+    ExpiresByType application/x-icon "access plus 1 month"
+</IfModule>
+
+# Comprimir archivos
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Configuraciones de seguridad adicionales (requieren mod_headers; sin el, se omiten en vez de tumbar el sitio con un 500)
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>

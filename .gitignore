@@ -1,0 +1,40 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+vendor/
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.env
+
+# Credenciales (SMTP de Gmail y token de WhatsApp/Meta).
+# Las plantillas sin secretos son config/mail.example.php y config/whatsapp.example.php.
+config/mail.php
+config/whatsapp.php
+config/app.php
+config/database.php
+
+# Carpeta de comprobantes de pago: contiene capturas bancarias de las familias
+img/comprobantes/*
+!img/comprobantes/.htaccess
+
+# Fotos de atletas (menores de edad): se guardan como img/atleta_<id>_<fecha>.<ext>; el logo no se ve afectado
+img/atleta_*

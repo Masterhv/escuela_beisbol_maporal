@@ -1,0 +1,893 @@
+/* ==========================================================================
+   pdf.css — Hoja de estilos ÚNICA de los documentos PDF
+   Sistema de Gestión · Escuela de Béisbol Menor Maporal
+
+   Los PDF se generan con Dompdf a partir de HTML en texto. Dompdf NO carga CSS
+   por URL, por eso el layout (views/reports/pdf/layouts/main.php) lee este
+   archivo con file_get_contents() y lo incrusta en un <style>.
+
+   REGLAS PARA EDITAR ESTE ARCHIVO
+   - Dompdf soporta CSS 2.1 y poco de CSS3: NO usar variables CSS (var()),
+     grid, calc() ni gradientes (usar valores literales).
+   - NO importa nada de style.css (ese es solo de la interfaz web).
+   - Cada documento tiene su clase raíz .pdf-<vista> (la pone el layout en
+     <main>). Las reglas propias de un documento van acotadas por esa clase,
+     porque documentos distintos usan los mismos nombres de clase con
+     tamaños distintos (cada uno está calibrado para caber en UNA página).
+
+   ÍNDICE
+     1. Página, tipografía y estructura común (header, footer, QR)
+     2. Componentes compartidos por varios documentos
+     3. Estilos por documento
+        3.1 Ficha del atleta        (.pdf-athlete_card)
+        3.2 Planilla de inscripción (.pdf-enrollment_form)
+        3.3 Recibo de pago          (.pdf-payment_receipt)
+        3.4 Lista de atletas        (.pdf-athlete_list)
+        3.5 Historial de pagos      (.pdf-payment_history)
+        3.6 Reporte financiero      (.pdf-financial_report)
+        3.7 Solvencia de retiro     (.pdf-clearance)
+        3.8 Constancia de pertenencia (.pdf-membership_certificate)
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. PÁGINA, TIPOGRAFÍA Y ESTRUCTURA COMÚN
+   ========================================================================== */
+
+/* Margen de página para los documentos con encabezado fijo (todos menos la ficha). */
+@page {
+    margin: 4cm 2cm 1.8cm;
+}
+
+body {
+    font-family: 'Helvetica', sans-serif;
+    font-size: 12px;
+    color: #333;
+}
+
+/* NOTA sobre el margen de página de la ficha y del recibo:
+   Antes el layout declaraba @page { margin: 1.2cm 2cm 1.6cm } solo para la ficha. Ese margen
+   nunca tuvo efecto visible: la ficha y el recibo aplican el reset "* { margin: 0; padding: 0 }"
+   (ver más abajo) también a <html>, y con ese reset Dompdf ignora el margen de @page (medido:
+   @page 1.2cm y @page 4cm dan exactamente la misma posición). Por eso basta un único @page.
+   @page tampoco admite condiciones ni páginas con nombre en Dompdf. */
+
+header {
+    position: fixed;
+    top: -3.7cm;
+    left: 0;
+    right: 0;
+    height: 3.3cm;
+    text-align: center;
+    border-bottom: 2px solid #8B1538;
+    padding: 8px 0 6px;
+}
+header img {
+    height: 55px;
+    width: auto;
+    margin: 0 auto 4px;
+    display: block;
+}
+header h1 {
+    margin: 0;
+    font-size: 14px;
+    color: #8B1538;
+    font-weight: bold;
+}
+header p {
+    margin: 3px 0 0 0;
+    font-size: 13px;
+    color: #8B1538;
+    font-weight: bold;
+}
+
+footer {
+    position: fixed;
+    bottom: -1.5cm;
+    left: 0;
+    right: 0;
+    height: 1cm;
+    text-align: center;
+    font-size: 10px;
+    color: #95a5a6;
+    border-top: 1px solid #ccc;
+    line-height: 1cm;
+}
+.pagenum:before {
+    content: counter(page);
+}
+
+/* Bloque de verificación con código QR (se añade al final de todos los documentos) */
+.qr-block {
+    margin-top: 20px;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fafafa;
+    display: table;
+    width: 100%;
+}
+.qr-image-cell {
+    display: table-cell;
+    width: 80px;
+    vertical-align: middle;
+}
+.qr-image-cell img {
+    width: 72px;
+    height: 72px;
+}
+.qr-text-cell {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 12px;
+}
+.qr-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #8B0000;
+    margin-bottom: 3px;
+}
+.qr-desc {
+    font-size: 9px;
+    color: #555;
+    line-height: 1.5;
+}
+.qr-token {
+    font-size: 7.5px;
+    color: #888;
+    font-family: monospace;
+    word-break: break-all;
+    margin-top: 4px;
+}
+.qr-fingerprint {
+    font-size: 7.5px;
+    color: #aaa;
+    font-family: monospace;
+    margin-top: 2px;
+}
+
+
+/* Reset de la ficha del atleta.
+   El recibo de pago TAMBIÉN lo aplicaba, pero se quitó: ese reinicio anulaba el top y el relleno de la
+   cabecera fija del layout y la dejaba fuera de la hoja (coordenadas negativas), duplicada con una
+   cabecera propia. Ahora el recibo se comporta como la planilla de inscripción y la solvencia.
+   La ficha aplicaba "* { box-sizing: border-box; margin: 0; padding: 0 }" a
+   TODO el documento, y como esa regla se declaraba después de las del layout, también anulaba
+   el margen/padding de html, body, header, footer y main (por ejemplo el padding del header
+   y el margen por defecto de la página). Se reproduce de forma explícita aquí, DESPUÉS de las
+   reglas del layout, para conservar el aspecto exacto. La clase pdf-<vista> la pone el layout
+   en <html>. No tocar sin comparar el PDF resultante. */
+.pdf-athlete_card,
+.pdf-athlete_card body,
+.pdf-athlete_card header,
+.pdf-athlete_card footer,
+.pdf-athlete_card main {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* ==========================================================================
+   2. COMPONENTES COMPARTIDOS
+   ========================================================================== */
+
+/* Mensaje cuando el documento no tiene datos que mostrar */
+.pdf-empty {
+    color: #999;
+    text-align: center;
+    margin-top: 40px;
+}
+
+/* Celda de tabla "sin resultados" */
+.pdf-no-results {
+    text-align: center;
+}
+
+/* Encabezado propio dentro del cuerpo (solo la ficha del atleta) */
+.pdf-athlete_card .report-header {
+    text-align: center;
+    border-bottom: 2px solid #8B1538;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+}
+.pdf-athlete_card .report-header img {
+    height: 60px;
+    width: auto;
+    display: block;
+    margin: 0 auto 6px;
+}
+.pdf-athlete_card .report-header h1 {
+    margin: 0;
+    font-size: 16px;
+    color: #8B1538;
+    font-weight: bold;
+}
+.pdf-athlete_card .report-header p {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    color: #8B1538;
+    font-weight: bold;
+}
+
+/* Estructura de campos en dos columnas (ficha, planilla y recibo) */
+.pdf-athlete_card .ft,
+.pdf-enrollment_form .ft,
+.pdf-payment_receipt .ft { display: table; width: 100%; }
+.pdf-athlete_card .fr,
+.pdf-enrollment_form .fr,
+.pdf-payment_receipt .fr { display: table-row; }
+.pdf-athlete_card .fc.full,
+.pdf-enrollment_form .fc.full { width: 100%; display: block; }
+
+/* Tablas de datos (lista de atletas, historial de pagos y reporte financiero) */
+.pdf-athlete_list table,
+.pdf-payment_history table,
+.pdf-financial_report table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.pdf-athlete_list th, .pdf-athlete_list td,
+.pdf-payment_history th, .pdf-payment_history td,
+.pdf-financial_report th, .pdf-financial_report td {
+    border: 1px solid #ddd;
+    text-align: left;
+}
+.pdf-athlete_list th,
+.pdf-payment_history th,
+.pdf-financial_report th {
+    background-color: #8B1538;
+    color: white;
+}
+.pdf-athlete_list tr:nth-child(even),
+.pdf-payment_history tr:nth-child(even),
+.pdf-financial_report tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Etiquetas de estado de pago (historial y reporte financiero): Aprobado, En Revision, Pendiente, Rechazado */
+.pdf-payment_history .status-approved,
+.pdf-financial_report .status-approved {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+.pdf-payment_history .status-in_review,
+.pdf-financial_report .status-in_review {
+    background-color: #dbeafe;
+    color: #1e40af;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+.pdf-payment_history .status-pending,
+.pdf-financial_report .status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+.pdf-payment_history .status-rejected,
+.pdf-financial_report .status-rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+
+/* ==========================================================================
+   3.1 FICHA DEL ATLETA  (.pdf-athlete_card)
+   Calibrada para caber en UNA página con fuentes de 7 a 9.5px.
+   ========================================================================== */
+
+.pdf-athlete_card * { box-sizing: border-box; margin: 0; padding: 0; }
+
+.pdf-athlete_card .ficha-body {
+    border: 1px solid #d0d0d0;
+    border-top: 3px solid #8B1538;
+    border-radius: 4px;
+    padding: 10px 12px 8px;
+    background: #fff;
+}
+
+/* Fila superior: foto + datos */
+.pdf-athlete_card .top-row {
+    display: table;
+    width: 100%;
+    margin-bottom: 8px;
+}
+.pdf-athlete_card .col-photo {
+    display: table-cell;
+    width: 110px;
+    vertical-align: top;
+    padding-right: 12px;
+}
+.pdf-athlete_card .col-info {
+    display: table-cell;
+    vertical-align: top;
+}
+
+/* Foto */
+.pdf-athlete_card .photo-wrap {
+    width: 98px;
+    height: 116px;
+    border: 2px solid #8B1538;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+.pdf-athlete_card .photo-wrap img {
+    width: 98px;
+    height: 116px;
+    object-fit: cover;
+    display: block;
+}
+.pdf-athlete_card .photo-placeholder-table {
+    width: 98px;
+    height: 116px;
+    background-color: #8B1538;
+    border-radius: 2px;
+}
+.pdf-athlete_card .photo-placeholder-cell {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+}
+.pdf-athlete_card .jersey-badge {
+    background: #8B1538;
+    color: #fff;
+    text-align: center;
+    font-size: 7.5px;
+    font-weight: bold;
+    padding: 2px 0;
+    border-radius: 0 0 3px 3px;
+    letter-spacing: 0.3px;
+}
+
+/* Nombre y estado */
+.pdf-athlete_card .athlete-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #111;
+    line-height: 1.2;
+    margin-bottom: 3px;
+}
+.pdf-athlete_card .athlete-meta { margin-bottom: 7px; font-size: 9px; color: #666; }
+.pdf-athlete_card .athlete-meta-gap { margin-left: 6px; }
+
+.pdf-athlete_card .status-chip {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.pdf-athlete_card .status-active    { background: #d1fae5; color: #065f46; }
+.pdf-athlete_card .status-inactive  { background: #fee2e2; color: #991b1b; }
+.pdf-athlete_card .status-suspended { background: #fef3c7; color: #92400e; }
+
+/* Secciones y campos */
+.pdf-athlete_card .section { margin-bottom: 6px; }
+.pdf-athlete_card .section-title {
+    font-size: 7.5px;
+    font-weight: bold;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    border-bottom: 1px solid #8B1538;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+}
+.pdf-athlete_card .fc { display: table-cell; width: 50%; padding: 1px 5px 2px 0; vertical-align: top; }
+.pdf-athlete_card .fl { font-size: 7px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.2px; }
+.pdf-athlete_card .fv { font-size: 9.5px; color: #1a1a1a; line-height: 1.3; }
+.pdf-athlete_card .fv--small { font-size: 9px; }
+.pdf-athlete_card .mt-4 { margin-top: 4px; }
+.pdf-athlete_card .mt-5 { margin-top: 5px; }
+
+.pdf-athlete_card .divider { border: none; border-top: 1px solid #ebebeb; margin: 7px 0 6px; }
+
+/* 3 columnas inferiores */
+.pdf-athlete_card .bottom-row { display: table; width: 100%; }
+.pdf-athlete_card .bc { display: table-cell; width: 33.33%; vertical-align: top; padding-right: 9px; }
+.pdf-athlete_card .bc:last-child { padding-right: 0; }
+.pdf-athlete_card .bv { font-size: 9px; color: #1a1a1a; line-height: 1.3; margin-top: 2px; }
+
+
+/* ==========================================================================
+   3.2 PLANILLA DE INSCRIPCIÓN  (.pdf-enrollment_form)
+   ========================================================================== */
+
+.pdf-enrollment_form * { box-sizing: border-box; }
+
+.pdf-enrollment_form .form-title {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.pdf-enrollment_form .form-title h2 {
+    font-size: 15px;
+    color: #111;
+    margin: 0;
+}
+
+/* Bloque destacado: N.° de inscripción y fecha */
+.pdf-enrollment_form .meta-box {
+    display: table;
+    width: 100%;
+    border: 2px solid #8B1538;
+    border-radius: 6px;
+    background: #fff8f8;
+    margin-bottom: 12px;
+}
+.pdf-enrollment_form .meta-cell {
+    display: table-cell;
+    width: 50%;
+    padding: 8px 12px;
+    vertical-align: middle;
+}
+.pdf-enrollment_form .meta-label {
+    font-size: 8px;
+    font-weight: bold;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.pdf-enrollment_form .meta-value {
+    font-size: 14px;
+    font-weight: bold;
+    color: #111;
+    margin-top: 2px;
+}
+
+.pdf-enrollment_form .section { margin-bottom: 10px; }
+.pdf-enrollment_form .section-title {
+    font-size: 9px;
+    font-weight: bold;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    border-bottom: 1px solid #8B1538;
+    padding-bottom: 3px;
+    margin-bottom: 5px;
+}
+.pdf-enrollment_form .fc { display: table-cell; width: 50%; padding: 2px 10px 6px 0; vertical-align: top; }
+.pdf-enrollment_form .fl { font-size: 7.5px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 0.2px; }
+.pdf-enrollment_form .fv { font-size: 10.5px; color: #1a1a1a; line-height: 1.4; margin-top: 1px; }
+/* Línea para escribir a mano en la planilla en blanco */
+.pdf-enrollment_form .fv.blank { border-bottom: 1px solid #555; height: 15px; }
+
+.pdf-enrollment_form .declaration {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: #f9f9f9;
+    border-left: 3px solid #8B1538;
+    font-size: 9.5px;
+    line-height: 1.5;
+    color: #333;
+    text-align: justify;
+}
+
+.pdf-enrollment_form .signatures { display: table; width: 100%; margin-top: 34px; }
+.pdf-enrollment_form .sig-cell { display: table-cell; width: 50%; text-align: center; padding: 0 16px; }
+.pdf-enrollment_form .sig-line { border-top: 1px solid #333; padding-top: 4px; font-size: 9px; color: #333; }
+.pdf-enrollment_form .sig-sub { font-size: 8px; color: #777; margin-top: 2px; }
+
+
+/* ==========================================================================
+   3.3 RECIBO DE PAGO  (.pdf-payment_receipt)
+   ========================================================================== */
+
+/* Solo box-sizing, igual que la planilla. Antes ponia tambien margin:0 y padding:0 a TODOS los elementos,
+   incluido el <header> fijo del layout, y lo subia fuera de su sitio. El cuerpo del recibo solo usa <div>,
+   <span>, un <h2> (con su propio margin:0) y un <p> sin datos, que no tienen margen por defecto. */
+.pdf-payment_receipt * { box-sizing: border-box; }
+
+.pdf-payment_receipt .receipt-body {
+    border: 1px solid #d0d0d0;
+    border-top: 3px solid #8B1538;
+    border-radius: 4px;
+    padding: 16px 18px;
+    background: #fff;
+}
+
+.pdf-payment_receipt .receipt-title {
+    text-align: center;
+    margin-bottom: 14px;
+}
+.pdf-payment_receipt .receipt-title h2 {
+    font-size: 15px;
+    color: #111;
+    margin: 0;
+}
+/* Mes que el representante está cancelando: debe leerse a primera vista */
+.pdf-payment_receipt .receipt-period {
+    margin-top: 8px;
+    padding: 6px 10px;
+    border: 1px solid #8B1538;
+    border-radius: 4px;
+    background: #fff8f8;
+    text-align: center;
+}
+.pdf-payment_receipt .receipt-period-label {
+    font-size: 9px;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.pdf-payment_receipt .receipt-period-value {
+    font-size: 15px;
+    font-weight: bold;
+    color: #111;
+    margin-left: 6px;
+}
+
+.pdf-payment_receipt .status-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    background: #d1fae5;
+    color: #065f46;
+    margin-top: 6px;
+}
+
+.pdf-payment_receipt .section { margin-bottom: 14px; }
+.pdf-payment_receipt .section-title {
+    font-size: 9px;
+    font-weight: bold;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    border-bottom: 1px solid #8B1538;
+    padding-bottom: 3px;
+    margin-bottom: 6px;
+}
+.pdf-payment_receipt .fc { display: table-cell; width: 50%; padding: 3px 8px 6px 0; vertical-align: top; }
+.pdf-payment_receipt .fl { font-size: 8px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.2px; }
+.pdf-payment_receipt .fv { font-size: 11px; color: #1a1a1a; line-height: 1.4; margin-top: 1px; }
+
+.pdf-payment_receipt .amount-box {
+    margin-top: 4px;
+    text-align: center;
+    border: 2px solid #8B1538;
+    border-radius: 6px;
+    padding: 12px;
+    background: #fff8f8;
+}
+.pdf-payment_receipt .amount-label {
+    font-size: 9px;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: bold;
+}
+.pdf-payment_receipt .amount-value {
+    font-size: 22px;
+    color: #111;
+    font-weight: bold;
+    margin-top: 4px;
+}
+
+.pdf-payment_receipt .notes-box {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    font-size: 9.5px;
+    color: #555;
+}
+
+
+/* ==========================================================================
+   3.4 LISTA DE ATLETAS  (.pdf-athlete_list)   — se genera en horizontal
+   ========================================================================== */
+
+.pdf-athlete_list .filters-info {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    font-size: 11px;
+}
+.pdf-athlete_list table {
+    font-size: 10px;
+    margin-top: 15px;
+}
+.pdf-athlete_list th,
+.pdf-athlete_list td {
+    padding: 6px;
+}
+
+
+/* ==========================================================================
+   3.5 HISTORIAL DE PAGOS  (.pdf-payment_history)
+   ========================================================================== */
+
+.pdf-payment_history .info-container {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    display: table;
+    width: 100%;
+}
+.pdf-payment_history .Athlete-info {
+    display: table-cell;
+    width: 65%;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    font-size: 12px;
+    vertical-align: top;
+    line-height: 1.8;
+}
+.pdf-payment_history .photo-container {
+    display: table-cell;
+    width: 35%;
+    text-align: center;
+    vertical-align: top;
+    padding-left: 15px;
+}
+.pdf-payment_history .photo-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 3px solid #8B1538;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+}
+.pdf-payment_history .photo-placeholder {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    border: 3px solid #8B1538;
+    border-radius: 8px;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* bajar el contenido hacia la parte inferior */
+    align-items: center;       /* centrado horizontalmente */
+    padding-bottom: 2px;       /* muy poco espacio con el borde inferior */
+    color: #999;
+}
+.pdf-payment_history .silhouette-head {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #cccccc;
+    margin: 0 auto;
+}
+.pdf-payment_history .silhouette-body {
+    width: 80px;
+    height: 55px;
+    border-radius: 50px 50px 15px 15px;
+    background: #cccccc;
+    margin: 6px auto 0 auto;
+}
+.pdf-payment_history .photo-label {
+    margin-top: 5px;
+    font-size: 10px;
+    color: #666;
+    font-style: italic;
+}
+.pdf-payment_history table { font-size: 11px; }
+.pdf-payment_history th,
+.pdf-payment_history td { padding: 7px; }
+
+
+/* ==========================================================================
+   3.6 REPORTE FINANCIERO  (.pdf-financial_report)
+   ========================================================================== */
+
+.pdf-financial_report .stats {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 12px;
+}
+.pdf-financial_report .stats h2 {
+    margin-top: 0;
+    font-size: 16px;
+    color: #000000;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+.pdf-financial_report .stats-row {
+    margin-top: 4px;
+}
+.pdf-financial_report .stats-row--spaced { margin-bottom: 6px; }
+.pdf-financial_report .stats-row span {
+    display: inline-block;
+    margin: 0 6px;
+}
+.pdf-financial_report table { font-size: 11px; }
+.pdf-financial_report th,
+.pdf-financial_report td { padding: 7px; }
+
+/* ==========================================================================
+   3.7 SOLVENCIA DE RETIRO  (.pdf-clearance)
+   Calibrada para caber en UNA página. El logo, el nombre de la escuela y el título los imprime la
+   cabecera fija del layout; aquí solo van el cuerpo y las tablas de campos.
+   ========================================================================== */
+
+.pdf-clearance .clearance-body {
+    border: 1px solid #d0d0d0;
+    border-top: 3px solid #8B1538;
+    border-radius: 4px;
+    padding: 16px 18px;
+    background: #fff;
+}
+
+/* Bloque destacado: N.° de solvencia y fecha de emisión */
+.pdf-clearance .clearance-number-box {
+    display: table;
+    width: 100%;
+    border: 2px solid #8B1538;
+    border-radius: 6px;
+    background: #fff8f8;
+    margin-bottom: 14px;
+}
+.pdf-clearance .clearance-number-cell {
+    display: table-cell;
+    width: 50%;
+    padding: 8px 12px;
+    vertical-align: middle;
+}
+.pdf-clearance .clearance-label {
+    font-size: 8px;
+    font-weight: bold;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.pdf-clearance .clearance-value {
+    font-size: 15px;
+    font-weight: bold;
+    color: #111;
+    margin-top: 2px;
+}
+
+.pdf-clearance .section { margin-bottom: 12px; }
+.pdf-clearance .section-title {
+    font-size: 9px;
+    font-weight: bold;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    border-bottom: 1px solid #8B1538;
+    padding-bottom: 3px;
+    margin-bottom: 5px;
+}
+.pdf-clearance .ft { display: table; width: 100%; }
+.pdf-clearance .fr { display: table-row; }
+.pdf-clearance .fc { display: table-cell; width: 50%; padding: 2px 10px 6px 0; vertical-align: top; }
+.pdf-clearance .fl { font-size: 7.5px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 0.2px; }
+.pdf-clearance .fv { font-size: 10.5px; color: #1a1a1a; line-height: 1.4; margin-top: 1px; }
+
+.pdf-clearance .declaration {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f9f9f9;
+    border-left: 3px solid #8B1538;
+    font-size: 10px;
+    line-height: 1.6;
+    color: #333;
+    text-align: justify;
+}
+
+.pdf-clearance .signatures { display: table; width: 100%; margin-top: 40px; }
+.pdf-clearance .sig-cell { display: table-cell; width: 50%; text-align: center; padding: 0 16px; }
+.pdf-clearance .sig-line { border-top: 1px solid #333; padding-top: 4px; font-size: 9px; color: #333; }
+.pdf-clearance .sig-sub { font-size: 8px; color: #777; margin-top: 2px; }
+
+/* ==========================================================================
+   3.8 CONSTANCIA DE PERTENENCIA  (.pdf-membership_certificate)
+   Calibrada para caber en UNA página. El logo, el nombre de la escuela y el título los imprime la
+   cabecera fija del layout; aquí solo van el cuerpo y las tablas de campos. No lleva ningún reinicio
+   global de margin/padding: ese tipo de regla desplazaba la cabecera fuera de la hoja.
+   ========================================================================== */
+
+.pdf-membership_certificate * { box-sizing: border-box; }
+
+.pdf-membership_certificate .certificate-body {
+    border: 1px solid #d0d0d0;
+    border-top: 3px solid #8B1538;
+    border-radius: 4px;
+    padding: 16px 18px;
+    background: #fff;
+}
+
+/* Bloque destacado: N.° de constancia y fecha de emisión */
+.pdf-membership_certificate .certificate-number-box {
+    display: table;
+    width: 100%;
+    border: 2px solid #8B1538;
+    border-radius: 6px;
+    background: #fff8f8;
+    margin-bottom: 14px;
+}
+.pdf-membership_certificate .certificate-number-cell {
+    display: table-cell;
+    width: 50%;
+    padding: 8px 12px;
+    vertical-align: middle;
+}
+.pdf-membership_certificate .certificate-label {
+    font-size: 8px;
+    font-weight: bold;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.pdf-membership_certificate .certificate-value {
+    font-size: 15px;
+    font-weight: bold;
+    color: #111;
+    margin-top: 2px;
+}
+
+.pdf-membership_certificate .section { margin-bottom: 12px; }
+.pdf-membership_certificate .section-title {
+    font-size: 9px;
+    font-weight: bold;
+    color: #8B1538;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    border-bottom: 1px solid #8B1538;
+    padding-bottom: 3px;
+    margin-bottom: 5px;
+}
+.pdf-membership_certificate .ft { display: table; width: 100%; }
+.pdf-membership_certificate .fr { display: table-row; }
+.pdf-membership_certificate .fc { display: table-cell; width: 50%; padding: 2px 10px 6px 0; vertical-align: top; }
+.pdf-membership_certificate .fl { font-size: 7.5px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 0.2px; }
+.pdf-membership_certificate .fv { font-size: 10.5px; color: #1a1a1a; line-height: 1.4; margin-top: 1px; }
+
+.pdf-membership_certificate .declaration {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f9f9f9;
+    border-left: 3px solid #8B1538;
+    font-size: 10px;
+    line-height: 1.6;
+    color: #333;
+    text-align: justify;
+}
+
+/* Vigencia: debe leerse a primera vista, porque es lo que impide usar la constancia fuera de plazo */
+.pdf-membership_certificate .validity-note {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: 1px solid #8B1538;
+    border-radius: 4px;
+    background: #fff8f8;
+    font-size: 9.5px;
+    line-height: 1.5;
+    color: #333;
+    text-align: center;
+}
+
+.pdf-membership_certificate .signatures { display: table; width: 100%; margin-top: 44px; }
+.pdf-membership_certificate .sig-cell { display: table-cell; width: 100%; text-align: center; padding: 0 90px; }
+.pdf-membership_certificate .sig-line { border-top: 1px solid #333; padding-top: 4px; font-size: 9px; color: #333; }
+.pdf-membership_certificate .sig-sub { font-size: 8px; color: #777; margin-top: 2px; }
