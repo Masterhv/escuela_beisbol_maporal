@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-11-2026 a las 23:06:30
+-- Tiempo de generación: 09-11-2026 a las 12:20:42
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -55,8 +55,9 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`id`, `username`, `password`, `email`, `id_card`, `birth_date`, `phone`, `address`, `emergency_contact_name`, `emergency_contact_relationship`, `emergency_contact_phone`, `full_name`, `role`, `operation_key`, `status`, `created_date`, `last_login`, `updated_at`, `reset_token`, `reset_token_expires_at`) VALUES
-(1, 'admin', '$2y$10$DsLsuKBgNC6i/eat8U0a8ebsUUm0heGOeW1aCoioFxe5TUukQ9yDe', 'beisbolmaporal@gmail.com', '24527809', '1993-04-12', '+584262747945', '1 Diciembre', 'Eurris Velázquez', 'padre', '+584245103144', 'Administrador Principal', 'administrador', '$2y$10$veJzQjPjB5EPP6NoioJPyu5wP1UsveBjU.vScg8ay6Pzufe/lmkHW', 'active', '2025-07-19 12:38:06', '2026-11-08 17:05:36', '2026-11-08 17:05:36', NULL, NULL),
-(2, 'valeromh', '$2y$10$UUxFXWeUA.pTzPEd0t87W.925RYMOZfckdkF3.1Pn4/l697h615Rq', 'valeromh@pdvsa.com.ve', '11324654', '1969-12-05', '0424-5852482', 'Urb. Ciudad Tavacare, Sector B, Bloque 8, Apartamento 3', 'Milangela de Valero', 'Esposa', '0414-1321316', 'Miguel Alejandro Valero Piedra', 'administrador', '$2y$10$2Sl0dv5HbX6rV0tEfGKvBObzV.KWhTpITTZdz4c1LsbPWlHQBi5Xq', 'active', '2025-11-17 22:53:24', '2026-06-29 22:39:40', '2026-10-29 20:38:05', NULL, NULL);
+(1, 'admin', '$2y$10$DsLsuKBgNC6i/eat8U0a8ebsUUm0heGOeW1aCoioFxe5TUukQ9yDe', 'beisbolmaporal@gmail.com', '24527809', '1993-04-12', '+584262747945', '1 Diciembre', 'Eurris Velázquez', 'padre', '+584245103144', 'Administrador Principal', 'administrador', '$2y$10$veJzQjPjB5EPP6NoioJPyu5wP1UsveBjU.vScg8ay6Pzufe/lmkHW', 'active', '2025-07-19 12:38:06', '2026-11-09 07:18:47', '2026-11-09 07:18:47', NULL, NULL),
+(2, 'valeromh', '$2y$10$UUxFXWeUA.pTzPEd0t87W.925RYMOZfckdkF3.1Pn4/l697h615Rq', 'valeromh@pdvsa.com.ve', '11324654', '1969-12-05', '0424-5852482', 'Urb. Ciudad Tavacare, Sector B, Bloque 8, Apartamento 3', 'Milangela de Valero', 'Esposa', '0414-1321316', 'Miguel Alejandro Valero Piedra', 'administrador', '$2y$10$2Sl0dv5HbX6rV0tEfGKvBObzV.KWhTpITTZdz4c1LsbPWlHQBi5Xq', 'active', '2025-11-17 22:53:24', '2026-06-29 22:39:40', '2026-10-29 20:38:05', NULL, NULL),
+(147, 'rattiae', '$2y$10$l98h3d8EIcw5H8yATVlKweXZJ0H3lHTXrXj.y23Z6fxhIVbCj.oPy', 'rattiae@gmail.com', '13216548', '1960-08-12', '0414-1234567', 'Raúl Leoni', 'Luis Rojas', 'sobrino', '0422-1234567', 'Edita Rattia de Escobar', 'representante', NULL, 'active', '2026-11-09 07:08:10', '2026-11-09 07:17:36', '2026-11-09 07:17:36', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -264,7 +265,8 @@ INSERT INTO `payments` (`id`, `athlete_id`, `concept_id`, `athlete_name`, `amoun
 (2, 11, 1, '', 10000.00, NULL, NULL, '2025-12-16', NULL, 'pending', 'Noviembre', 2025, 'Pendiente por pagar', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 17:39:10', '2026-10-29 19:40:53'),
 (3, 13, 1, '', 10000.00, NULL, NULL, '2025-12-16', NULL, 'pending', 'Noviembre', 2025, 'referencia 9541', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 17:40:06', '2026-10-29 19:18:55'),
 (4, 14, 1, '', 10000.00, NULL, NULL, '2025-12-16', '2025-11-16', 'approved', 'Noviembre', 2025, 'numero de referencia 6520', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 21:14:36', '2026-10-29 19:18:55'),
-(5, 14, 1, '', 10000.00, NULL, NULL, '2026-01-16', '2025-11-16', 'approved', 'Diciembre', 2025, 'pago por adelantado de Diciembre, número de referencia 6895', NULL, NULL, NULL, NULL, NULL, 'img/comprobantes/comprobante_6a3cb2f5b8c16_1782362869.png', 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 21:16:55', '2026-10-29 19:18:55');
+(5, 14, 1, '', 10000.00, NULL, NULL, '2026-01-16', '2025-11-16', 'approved', 'Diciembre', 2025, 'pago por adelantado de Diciembre, número de referencia 6895', NULL, NULL, NULL, NULL, NULL, 'img/comprobantes/comprobante_6a3cb2f5b8c16_1782362869.png', 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 21:16:55', '2026-10-29 19:18:55'),
+(206, 12, 1, '', 10000.00, '01010101010101010101', 'transferencia', '2026-12-09', '2026-11-09', 'in_review', 'Noviembre', 2026, '', 147, '2026-11-09 07:18:17', NULL, NULL, NULL, 'img/comprobantes/comprobante_a240d42fb39048ea_1794223097.jpg', 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 07:10:09', '2026-11-09 07:18:17');
 
 -- --------------------------------------------------------
 
@@ -320,7 +322,9 @@ CREATE TABLE `payment_history` (
 INSERT INTO `payment_history` (`id`, `payment_id`, `from_status`, `to_status`, `action`, `actor_id`, `actor_name`, `actor_role`, `comment`, `amount`, `created_at`) VALUES
 (1, 1, 'paid', 'approved', 'migrate', NULL, 'Migracion del sistema', 'sistema', 'Pago ya cobrado antes del flujo de verificacion; aprobador original no registrado.', 10000.00, '2026-10-29 19:18:55'),
 (2, 4, 'paid', 'approved', 'migrate', NULL, 'Migracion del sistema', 'sistema', 'Pago ya cobrado antes del flujo de verificacion; aprobador original no registrado.', 10000.00, '2026-10-29 19:18:55'),
-(3, 5, 'paid', 'approved', 'migrate', NULL, 'Migracion del sistema', 'sistema', 'Pago ya cobrado antes del flujo de verificacion; aprobador original no registrado.', 10000.00, '2026-10-29 19:18:55');
+(3, 5, 'paid', 'approved', 'migrate', NULL, 'Migracion del sistema', 'sistema', 'Pago ya cobrado antes del flujo de verificacion; aprobador original no registrado.', 10000.00, '2026-10-29 19:18:55'),
+(71, 206, NULL, 'pending', 'create', 1, 'Administrador Principal', 'administrador', 'Cobro generado.', 10000.00, '2026-11-09 07:10:09'),
+(72, 206, 'pending', 'in_review', 'report', 147, 'Edita Rattia de Escobar', 'representante', NULL, 10000.00, '2026-11-09 07:18:17');
 
 -- --------------------------------------------------------
 
@@ -418,7 +422,7 @@ CREATE TABLE `school_bank_account` (
   `updated_by` int(11) DEFAULT NULL,
   `updated_by_name` varchar(100) DEFAULT NULL COMMENT 'Copia del nombre: sigue legible si la cuenta cambia',
   `updated_at` datetime DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `school_bank_account`
@@ -469,6 +473,7 @@ CREATE TABLE `send_counters` (
 
 INSERT INTO `send_counters` (`channel`, `day`, `used`) VALUES
 ('email', '2026-10-29', 1),
+('email', '2026-11-09', 2),
 ('whatsapp', '2026-10-29', 1);
 
 -- --------------------------------------------------------
@@ -493,7 +498,9 @@ CREATE TABLE `send_log` (
 
 INSERT INTO `send_log` (`id`, `channel`, `purpose`, `status`, `recipient_hash`, `detail`, `created_at`) VALUES
 (110, 'email', 'document', 'sent', 'f440db56877d3e7f', NULL, '2026-10-29 23:09:59'),
-(111, 'whatsapp', 'whatsapp', 'sent', 'e95acccaa3b2652c', NULL, '2026-10-29 23:10:03');
+(111, 'whatsapp', 'whatsapp', 'sent', 'e95acccaa3b2652c', NULL, '2026-10-29 23:10:03'),
+(112, 'email', 'notification', 'sent', 'f440db56877d3e7f', NULL, '2026-11-09 07:18:18'),
+(113, 'email', 'notification', 'sent', '6d30eac4f1a9f576', NULL, '2026-11-09 07:18:20');
 
 -- --------------------------------------------------------
 
@@ -760,7 +767,7 @@ ALTER TABLE `training_sessions`
 -- AUTO_INCREMENT de la tabla `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=147;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
 
 --
 -- AUTO_INCREMENT de la tabla `athletes`
@@ -790,7 +797,7 @@ ALTER TABLE `membership_certificates`
 -- AUTO_INCREMENT de la tabla `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=207;
 
 --
 -- AUTO_INCREMENT de la tabla `payment_concepts`
@@ -802,7 +809,7 @@ ALTER TABLE `payment_concepts`
 -- AUTO_INCREMENT de la tabla `payment_history`
 --
 ALTER TABLE `payment_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT de la tabla `pdf_verifications`
@@ -820,7 +827,7 @@ ALTER TABLE `school_bank_account_history`
 -- AUTO_INCREMENT de la tabla `send_log`
 --
 ALTER TABLE `send_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=112;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 
 --
 -- AUTO_INCREMENT de la tabla `tournaments`
