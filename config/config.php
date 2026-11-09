@@ -175,20 +175,26 @@ ini_set('log_errors', 1);
  * @param string $class_name El nombre de la clase a cargar.
  */
 spl_autoload_register(function ($class_name) {
-    // Directorios donde se buscarán las clases.
+    // Directorios base absolutos donde se buscarán las clases.
     $directories = [
-        'models/',
-        'controllers/',
-        'services/',
-        'config/'
+        BASE_PATH . 'models/',
+        BASE_PATH . 'controllers/',
+        BASE_PATH . 'services/',
+        BASE_PATH . 'config/'
     ];
     
-    // Itera sobre los directorios para encontrar el archivo de la clase.
     foreach ($directories as $directory) {
+        // 1. Probar nombre exacto (ej. Admin.php)
         $file = $directory . $class_name . '.php';
         if (file_exists($file)) {
             require_once $file;
-            return; // Termina la función una vez que se encuentra y carga la clase.
+            return;
+        }
+        // 2. Probar en minúsculas para compatibilidad en Linux (ej. database.php para la clase Database)
+        $fileLower = $directory . strtolower($class_name) . '.php';
+        if (file_exists($fileLower)) {
+            require_once $fileLower;
+            return;
         }
     }
 });

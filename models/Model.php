@@ -17,11 +17,42 @@ class Model {
     
     /**
      * Constructor de la clase Model.
-     * Inicializa la conexión a la base de datos.
+     * Inicializa la conexión a la base de datos de manera tolerante a fallos.
      */
     public function __construct() {
-        $database = new Database();
-        $this->db = $database->getConnection();
+        if (!class_exists('Database')) {
+            $base = defined('BASE_PATH') ? BASE_PATH : (dirname(__DIR__) . DIRECTORY_SEPARATOR);
+            $dbConfig = $base . 'config' . DIRECTORY_SEPARATOR . 'database.php';
+            $dbConfigAlt = $base . 'config' . DIRECTORY_SEPARATOR . 'Database.php';
+
+            if (is_file($dbConfig)) {
+                require_once $dbConfig;
+            } elseif (is_file($dbConfigAlt)) {
+                require_once $dbConfigAlt;
+            }
+        }
+
+        if (class_exists('Database')) {
+            try {
+                $database = new Database();
+                $this->db = $database->getConnection();
+            } catch (\Throwable $e) {
+                error_log('[Model] Error al conectar con la base de datos: ' . $e->getMessage());
+                $this->db = null;
+            }
+        } else {
+            error_log('[Model] No se encontró la clase Database. Asegúrate de que config/database.php existe en el servidor.');
+            $this->db = null;
+        }
+    }
+
+    /**
+     * Devuelve la instancia de conexión PDO activa o null si no se pudo conectar.
+     *
+     * @return PDO|null
+     */
+    public function getDb() {
+        return $this->db;
     }
     
     /**

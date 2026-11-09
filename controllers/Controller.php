@@ -30,8 +30,17 @@ class Controller {
      * @param string $model El nombre del modelo a cargar (sin la extensión .php).
      */
     protected function loadModel($model) {
-        require_once 'models/' . $model . '.php';
-        $this->model = new $model();
+        $base = defined('BASE_PATH') ? BASE_PATH : (dirname(__DIR__) . DIRECTORY_SEPARATOR);
+        $file = $base . 'models' . DIRECTORY_SEPARATOR . $model . '.php';
+        if (is_file($file)) {
+            require_once $file;
+        }
+        if (class_exists($model)) {
+            $this->model = new $model();
+        } else {
+            error_log("[Controller] No se pudo cargar el modelo: {$model}");
+            $this->model = null;
+        }
     }
     
     /**

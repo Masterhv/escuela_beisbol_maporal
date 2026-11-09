@@ -16,9 +16,16 @@ class View {
         // Extrae los datos del array para que estén disponibles como variables en la vista
         extract($data);
         
+        $base = defined('BASE_PATH') ? BASE_PATH : (dirname(__DIR__) . DIRECTORY_SEPARATOR);
+
         // Inicia el buffer de salida para capturar el contenido de la vista
         ob_start();
-        require_once "views/{$view}.php";
+        $viewFile = $base . 'views' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $view) . '.php';
+        if (is_file($viewFile)) {
+            require_once $viewFile;
+        } else {
+            echo "<p>Error: No se encontró la vista {$view}</p>";
+        }
         $content = ob_get_clean();
         
         // Si es para un PDF, solo se retorna el contenido crudo
@@ -27,7 +34,12 @@ class View {
         }
         
         // Carga el layout principal que envolverá el contenido de la vista
-        require_once 'views/layouts/main.php';
+        $layoutFile = $base . 'views' . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . 'main.php';
+        if (is_file($layoutFile)) {
+            require_once $layoutFile;
+        } else {
+            echo $content;
+        }
     }
     
     /**
@@ -39,7 +51,11 @@ class View {
      */
     public function renderPartial($view, $data = []) {
         extract($data);
-        require_once "views/{$view}.php";
+        $base = defined('BASE_PATH') ? BASE_PATH : (dirname(__DIR__) . DIRECTORY_SEPARATOR);
+        $viewFile = $base . 'views' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $view) . '.php';
+        if (is_file($viewFile)) {
+            require_once $viewFile;
+        }
     }
     
     /**

@@ -8,11 +8,12 @@ require_once 'controllers/Controller.php';
 class AuthController extends Controller {
     
     /**
-     * Constructor. Carga el modelo Admin.
+     * Constructor.
      */
     public function __construct() {
         parent::__construct();
-        $this->loadModel('Admin');
+        // El modelo Admin se carga bajo demanda (solo en POST) para permitir que la vista
+        // de login se renderice siempre, incluso si la BD aún no ha sido configurada.
     }
     
     /**
@@ -26,11 +27,14 @@ class AuthController extends Controller {
         }
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $username = trim($_POST['username']);
-            $password = trim($_POST['password']);
+            $this->loadModel('Admin');
+            $username = trim($_POST['username'] ?? '');
+            $password = trim($_POST['password'] ?? '');
             
             if (empty($username) || empty($password)) {
                 $error = "Por favor, complete todos los campos";
+            } elseif (!$this->model || !$this->model->getDb()) {
+                $error = "Error de conexión con la base de datos. Verifique config/database.php en el servidor.";
             } else {
                 // Autenticar al usuario a través del modelo
                 $admin = $this->model->authenticate($username, $password);

@@ -79,12 +79,14 @@ class Router {
         // Soporte de nombres de controlador con guiones (ej. password-reset -> PasswordResetController)
         $controllerClass = str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $controllerName))) . 'Controller';
 
+        $base = defined('BASE_PATH') ? BASE_PATH : (dirname(__DIR__) . DIRECTORY_SEPARATOR);
+
         // Rutas para restablecimiento de contraseña (/password/*)
         if ($controllerName === 'password') {
             $controllerClass = 'PasswordResetController';
-            $controllerFile = 'controllers/' . $controllerClass . '.php';
+            $controllerFile = $base . 'controllers' . DIRECTORY_SEPARATOR . $controllerClass . '.php';
 
-            if (file_exists($controllerFile)) {
+            if (is_file($controllerFile)) {
                 require_once $controllerFile;
                 $controllerInstance = new $controllerClass();
 
@@ -109,8 +111,8 @@ class Router {
 
         // Ruta pública de verificación de documentos (/verify) — no requiere autenticación
         if ($controllerName === 'verify') {
-            $controllerFile = 'controllers/VerifyController.php';
-            if (file_exists($controllerFile)) {
+            $controllerFile = $base . 'controllers' . DIRECTORY_SEPARATOR . 'VerifyController.php';
+            if (is_file($controllerFile)) {
                 require_once $controllerFile;
                 // Permitir token como segundo segmento si no viene por GET (?token=...)
                 if ($action !== 'index' && empty($_GET['token'])) {
@@ -131,9 +133,9 @@ class Router {
             $action = 'login';
         }
         
-        $controllerFile = 'controllers/' . $controllerClass . '.php';
+        $controllerFile = $base . 'controllers' . DIRECTORY_SEPARATOR . $controllerClass . '.php';
         
-        if (file_exists($controllerFile)) {
+        if (is_file($controllerFile)) {
             require_once $controllerFile;
 
             if (class_exists($controllerClass)) {
