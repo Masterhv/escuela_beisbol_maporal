@@ -328,6 +328,40 @@
                 </div>
             </div>
 
+            <!-- Plan de cobros: montos definidos por el administrador en Conceptos -->
+            <?php
+            $planConcepts = $planConcepts ?? (new PaymentWorkflow())->planConcepts();
+            $planEnrollment = $planConcepts['enrollment'];
+            $planMonthly = $planConcepts['monthly'];
+            $planChecked = !isset($Athlete) || !empty($Athlete['generate_plan']);
+            $planMonths = isset($Athlete['plan_months']) ? (int)$Athlete['plan_months'] : 5;
+            ?>
+            <div class="pb-6 border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-1">Plan de cobros</h3>
+                <p class="text-sm text-gray-600 mb-4">Al crear el atleta se generan sus cobros como <strong>Pendientes</strong> para que el representante los reporte desde "Mis pagos". Los montos son los del módulo de Conceptos.</p>
+                <?php if (!$planEnrollment && !$planMonthly): ?>
+                <p class="text-sm text-red-700">No hay conceptos activos de Inscripción ni de Mensualidad: los cobros deberán generarse a mano.</p>
+                <?php else: ?>
+                <label class="flex items-center gap-2 mb-3">
+                    <input type="checkbox" name="generate_plan" value="1" <?php echo $planChecked ? 'checked' : ''; ?>>
+                    <span class="text-sm text-gray-800">Generar cobros automáticamente</span>
+                </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="text-sm text-gray-800">
+                        <strong>Inscripción:</strong>
+                        <?php echo $planEnrollment ? 'Bs. ' . number_format((float)$planEnrollment['default_amount'], 2) . ' (vence a los 7 días)' : 'sin concepto activo, no se generará'; ?>
+                    </div>
+                    <div>
+                        <label for="plan_months" class="block text-sm font-medium text-gray-700 mb-1">
+                            Mensualidades <?php echo $planMonthly ? '(Bs. ' . number_format((float)$planMonthly['default_amount'], 2) . ' c/u)' : '(sin concepto activo)'; ?>
+                        </label>
+                        <input type="number" id="plan_months" name="plan_months" min="0" max="<?php echo PaymentWorkflow::PLAN_MAX_MONTHS; ?>" value="<?php echo $planMonths; ?>" <?php echo $planMonthly ? '' : 'disabled'; ?> class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Desde el mes actual; cada una vence el mismo día del mes siguiente.</p>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+
             <!-- Botones -->
             <div class="flex gap-4 pt-6 border-t border-gray-200">
                 <button 

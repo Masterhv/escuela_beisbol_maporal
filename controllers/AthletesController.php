@@ -199,10 +199,19 @@ class AthletesController extends Controller {
             }
 
             if ($result['success']) {
-                // Envía la planilla de inscripción al representante por correo y WhatsApp.
+                // Plan de cobros (inscripcion + mensualidades con los montos de Conceptos). Igual que la planilla,
+                // un fallo aqui nunca revierte el registro del atleta: se informa y los cobros se generan a mano.
+                $planQuery = '';
+                if (!empty($data['generate_plan']) && $result['id']) {
+                    $plan = (new PaymentWorkflow())->createEnrollmentPlan($result['id'], (int)($data['plan_months'] ?? 0), $this->statusActor());
+                    $planQuery = $plan['ok'] ? '&plan=' . $plan['created'] . (empty($plan['missing']) ? '' : '&plan_missing=' . urlencode(implode(',', $plan['missing'])))
+                                             : '&plan_error=1';
+                }
+
+                // EnvÃ­a la planilla de inscripciÃ³n al representante por correo y WhatsApp.
                 // Un fallo en cualquier canal nunca revierte el registro del atleta.
                 $this->sendEnrollmentSafely($result['id']);
-                $this->redirect('athletes?success=created');
+                $this->redirect('athletes?success=created' . $planQuery);
             } else {
                 // Si falla la creación, eliminar la foto subida
                 if (!empty($photoPath) && file_exists($photoPath)) {
@@ -216,7 +225,8 @@ class AthletesController extends Controller {
             }
         } else {
             $this->view->render('athletes/create', [
-                'title' => 'Nuevo Atleta'
+                'title' => 'Nuevo Atleta',
+                'planConcepts' => (new PaymentWorkflow())->planConcepts(),
             ]);
         }
     }

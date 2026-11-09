@@ -319,6 +319,105 @@ class PaymentWorkflow extends Model {
         }
     }
 
+    public const MONTH_NAMES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto',
+                                'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    /** Maximo de mensualidades que puede generar el plan de inscripcion. */
+    public const PLAN_MAX_MONTHS = 12;
+
+    /**
+     * Conceptos que usa el plan de inscripcion, con los montos que definio el administrador en Conceptos:
+     * 'enrollment' = concepto activo NO mensual cuyo nombre empieza por "Inscrip"; 'monthly' = primer concepto
+     * activo mensual. Cualquiera de los dos puede ser null si no existe o esta inactivo.
+     */
+    public function planConcepts() {
+        $enrollment = $this->db->query(
+            "SELECT * FROM payment_concepts WHERE is_active = 1 AND is_monthly = 0 AND name LIKE 'Inscrip%' ORDER BY id LIMIT 1"
+        )->fetch(PDO::FETCH_ASSOC) ?: null;
+        $monthly = $this->db->query(
+            "SELECT * FROM payment_concepts WHERE is_active = 1 AND is_monthly = 1 ORDER BY id LIMIT 1"
+        )->fetch(PDO::FETCH_ASSOC) ?: null;
+        return ['enrollment' => $enrollment, 'monthly' => $monthly];
+    }
+
+    /**
+     * Plan de cobros al inscribir un atleta (estilo cuotas): 1 cobro de inscripcion + N mensualidades
+     * consecutivas desde el mes de inscripcion, todos Pendientes y con su bitacora, en UNA transaccion
+     * (o se crean todos, o ninguno). Los montos salen de Conceptos, nunca del formulario.
+     *
+     * Vencimientos: la inscripcion a los 7 dias; la mensualidad de cada mes, el mismo dia del mes siguiente
+     * (ajustado al ultimo dia si ese mes es mas corto). Un cobro igual ya existente (atleta, concepto, mes, anio)
+     * se omite, para que un reintento no duplique cobros.
+     *
+     * @return array ['ok'=>bool, 'created'=>int, 'missing'=>string[] conceptos no disponibles]
+     */
+    public function createEnrollmentPlan($athleteId, $months, array $actor, $date = null) {
+        $months = max(0, min(self::PLAN_MAX_MONTHS, (int)$months));
+        $concepts = $this->planConcepts();
+        $base = new DateTime($date ?: 'today');
+        $day = (int)$base->format('j');
+
+        $charges = [];
+        $missing = [];
+        if ($concepts['enrollment']) {
+            $charges[] = [$concepts['enrollment'], (clone $base)->modify('+7 days'), $base];
+        } else {
+            $missing[] = 'Inscripcion';
+        }
+        if ($months > 0 && !$concepts['monthly']) {
+            $missing[] = 'Mensualidad';
+        } elseif ($months > 0) {
+            for ($k = 0; $k < $months; $k++) {
+                $period = (new DateTime($base->format('Y-m-01')))->modify("+{$k} month");
+                $dueMonth = (clone $period)->modify('+1 month');
+                $due = $dueMonth->setDate((int)$dueMonth->format('Y'), (int)$dueMonth->format('n'), min($day, (int)$dueMonth->format('t')));
+                $charges[] = [$concepts['monthly'], $due, $period];
+            }
+        }
+
+        try {
+            $this->db->beginTransaction();
+            $exists = $this->db->prepare(
+                "SELECT COUNT(*) FROM payments WHERE athlete_id = :aid AND concept_id = :cid AND month = :m AND year = :y"
+            );
+            $insert = $this->db->prepare(
+                "INSERT INTO payments (athlete_id, athlete_name, concept_id, amount, due_date, status, month, year, notes)
+                 VALUES (:aid, '', :cid, :amt, :due, 'pending', :month, :year, :notes)"
+            );
+            $hist = $this->db->prepare(
+                "INSERT INTO payment_history (payment_id, from_status, to_status, action, actor_id, actor_name, actor_role, comment, amount)
+                 VALUES (:pid, NULL, 'pending', 'create', :aid, :an, :ar, :c, :amt)"
+            );
+
+            $created = 0;
+            foreach ($charges as [$concept, $due, $period]) {
+                $month = self::MONTH_NAMES[(int)$period->format('n') - 1];
+                $year = (int)$period->format('Y');
+                $exists->execute([':aid' => (int)$athleteId, ':cid' => (int)$concept['id'], ':m' => $month, ':y' => $year]);
+                if ((int)$exists->fetchColumn() > 0) {
+                    continue;
+                }
+                $insert->execute([
+                    ':aid' => (int)$athleteId, ':cid' => (int)$concept['id'], ':amt' => $concept['default_amount'],
+                    ':due' => $due->format('Y-m-d'), ':month' => $month, ':year' => $year,
+                    ':notes' => 'Generado automaticamente al inscribir al atleta.',
+                ]);
+                $hist->execute([
+                    ':pid' => (int)$this->db->lastInsertId(), ':aid' => $actor['id'] !== null ? (int)$actor['id'] : null,
+                    ':an' => (string)$actor['name'], ':ar' => (string)$actor['role'],
+                    ':c' => 'Cobro generado por el plan de inscripcion.', ':amt' => $concept['default_amount'],
+                ]);
+                $created++;
+            }
+            $this->db->commit();
+            return ['ok' => true, 'created' => $created, 'missing' => $missing];
+        } catch (\Throwable $e) {
+            if ($this->db->inTransaction()) { $this->db->rollBack(); }
+            error_log('[PaymentWorkflow::createEnrollmentPlan] ' . $e->getMessage());
+            return ['ok' => false, 'created' => 0, 'missing' => $missing];
+        }
+    }
+
     /**
      * Edicion de datos de un cobro. SOLO mientras el pago esta 'pending' o 'rejected': en revision
      * o aprobado, monto/fecha/mes no se tocan (para cambiarlos hay que rechazar o reabrir antes).

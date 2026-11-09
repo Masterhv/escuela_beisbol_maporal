@@ -23,6 +23,21 @@
         </div>
     </div>
 
+    <?php if (($_GET['success'] ?? '') === 'created'): ?>
+    <div class="pay-notice pay-notice--approved"><p class="pay-notice__text">
+        Atleta inscrito correctamente.
+        <?php if (isset($_GET['plan'])): ?>
+            Se generaron <?php echo (int)$_GET['plan']; ?> cobro(s) pendiente(s) para el representante.
+            <?php if (!empty($_GET['plan_missing'])): ?>
+                No se generó: <?php echo htmlspecialchars($_GET['plan_missing']); ?> (concepto inactivo o inexistente).
+            <?php endif; ?>
+        <?php endif; ?>
+    </p></div>
+    <?php if (!empty($_GET['plan_error'])): ?>
+    <div class="pay-notice pay-notice--rejected"><p class="pay-notice__text">No se pudieron generar los cobros automáticos. Genéralos desde Pagos &gt; Generar cobro.</p></div>
+    <?php endif; ?>
+    <?php endif; ?>
+
     <!-- Filter Form -->
     <div class="bg-white p-6 rounded-xl shadow-sm border">
         <form method="GET" action="<?php echo BASE_URL; ?>athletes" class="space-y-4">
