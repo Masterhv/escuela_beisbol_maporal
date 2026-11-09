@@ -65,6 +65,7 @@ Este sistema proporciona una solución completa para la gestión de Atletas, pag
 - ✅ **Separación de funciones:** quien reporta o registra un pago no puede aprobarlo ni rechazarlo, sea secretario o administrador: siempre hace falta una **segunda persona** que concilie
 - ✅ El **representante** consulta el estado de cuenta de sus atletas y **reporta sus pagos** (referencia, fecha, método y comprobante)
 - ✅ **Catálogo de conceptos de cobro** (mensualidad, inscripción, uniforme…) con tarifa, administrado por el administrador
+- ✅ **Plan de cobros automático al inscribir** (estilo cuotas): 1 cobro de inscripción + N mensualidades (5 por defecto) se generan como **Pendientes** con los montos definidos en Conceptos, sin crearlos uno a uno
 - ✅ **Datos bancarios de la escuela** (transferencia y pago móvil) que carga el administrador en Conceptos y que el representante ve al reportar su pago; cada cambio queda registrado con quién, cuándo y el valor anterior
 - ✅ **Historial inmutable** de cada pago: quién hizo qué, cuándo y por qué
 - ✅ **Pago aprobado = cerrado.** Solo el administrador puede reabrirlo, con motivo obligatorio
@@ -820,11 +821,22 @@ Una vez autenticado, verá:
 3. Se mostrará vista previa
 4. El sistema valida automáticamente formato y tamaño
 
-**Paso 7: Guardar**
+**Paso 7: Plan de cobros**
+
+Al final del formulario, antes de guardar, se define cómo se cobrará a este representante (estilo cuotas, sin crear los cobros uno a uno):
+
+- **Generar cobros automáticamente** (\*): marcada por defecto. Al crear el atleta se generan sus cobros como **Pendientes**
+- **Inscripción**: primer concepto activo no mensual cuyo nombre empieza por "Inscrip"; vence a los 7 días
+- **Mensualidades** (\*): cuántas se generan (0 a 12; **5** por defecto). Usa el primer concepto activo mensual; empiezan en el mes de inscripción y cada una **vence el mismo día del mes siguiente** (si ese mes es más corto, el último día)
+- Los montos **no se escriben aquí**: son los `default_amount` definidos por el administrador en **Conceptos**. Cambiar la tarifa allí afecta a las inscripciones siguientes, nunca a cobros ya creados
+- Si un cobro igual (atleta, concepto, mes, año) ya existe, se omite: un reintento no duplica cobros
+- Si falta un concepto activo se crea el resto y el aviso del listado indica cuál faltó; si todo el plan falla, el atleta igual queda inscrito (avisa y se generan los cobros a mano desde Pagos)
+
+**Paso 8: Guardar**
 
 1. Revisar todos los datos
-2. Hacer clic en **Guardar Atleta**
-3. Se mostrará mensaje de confirmación
+2. Hacer clic en **Crear Atleta**
+3. Se mostrará mensaje de confirmación con la cantidad de cobros generados
 4. Se redirigirá a la Lista de Atletas
 
 ### Buscar Atletas
@@ -1006,6 +1018,8 @@ Se ve en dos sitios: en el **detalle del atleta** (bloque *Estado y retiro*, con
 3. Elegir el **concepto**; el monto se rellena con la tarifa, y puede ajustarse para este cobro
 4. Indicar mes, año y fecha de vencimiento
 5. **Generar cobro**. Nace como **Pendiente**: no existe una opción para crearlo ya pagado.
+
+> 💡 **Cobros regulares:** no hace falta pasar por aquí por cada atleta nuevo. Al inscribir un atleta con el **Plan de cobros** marcado (ver *Crear Nuevo Atleta*, paso 7) la inscripción y las mensualidades se generan solas; este formulario queda para **cobros individuales** (uniformes, torneos…), para ajustar un monto distinto a la tarifa, o para regenerar cobros que faltaron porque el plan los omitió o falló.
 
 ### Reportar un pago (representante)
 
@@ -1448,7 +1462,7 @@ protected function jsonResponse(array $data)        // Respuesta JSON
 ```php
 public function findById($id)                       // Buscar por ID
 public function findAll($conditions, $orderBy)      // Buscar todos
-public function create($data)                       // Crear registro
+public function create($data)                       // Crear registro: devuelve el id; true si se inserto sin id generado (nunca falsy); false si fallo
 public function update($id, $data)                  // Actualizar registro
 public function delete($id)                         // Eliminar registro
 ```
@@ -1458,6 +1472,9 @@ public function delete($id)                         // Eliminar registro
 - **Athlete** - Modelo de Atletas
 - **Payment** - Modelo de pagos
 - **Admin** - Modelo de administradores
+- **PaymentWorkflow** - Única puerta por la que cambia el estado de un pago. Métodos propios del plan de inscripción:
+    - `planConcepts()` — conceptos activos que usa el plan (inscripción: activo no mensual "Inscrip%"; mensualidad: primer mensual activo)
+    - `createEnrollmentPlan($athleteId, $months, $actor, $date)` — genera en UNA transacción el cobro de inscripción + N mensualidades como Pendientes, con montos de Conceptos, vencimientos calculados y omisión de duplicados (atleta, concepto, mes, año)
 
 ## 🛣️ Sistema de Rutas
 
@@ -2222,6 +2239,51 @@ CREATE TABLE tournament_participants (
 
 ---
 
+## 🆕 Versión 1.3.0 — Plan de cobros automático y robustez de registros (Noviembre 2026)
+
+### ✨ Nueva funcionalidad: Plan de cobros automático al inscribir un atleta
+
+Al inscribir un atleta, el sistema puede generar los cobros del representante en el mismo paso (estilo cuotas), sin crearlos uno a uno:
+
+- **Qué se genera:** 1 cobro de **inscripción** + N **mensualidades** (5 por defecto, configurable de 0 a 12), todos nacen **Pendientes** y con su registro en la bitácora (`payment_history`, acción `create`).
+- **Montos tomados de Conceptos:** la inscripción usa el primer concepto activo no mensual cuyo nombre empieza por "Inscrip"; las mensualidades, el primer concepto mensual activo. El monto SIEMPRE es el `default_amount` del concepto: el formulario no lo edita. Cambiar la tarifa en Conceptos afecta solo a las inscripciones siguientes.
+- **Esquema de vencimientos:** la inscripción vence a los **7 días**; cada mensualidad vence el **mismo día del mes siguiente** al de su periodo (si el mes es más corto, el último día). Las mensualidades empiezan en el mes de la inscripción.
+- **Seguridad de datos:** todo el plan se inserta en **una transacción** (o se crean todos los cobros, o ninguno) y es INDEPENDIENTE del registro del atleta: si el plan falla, el atleta igual queda inscrito, se avisa y los cobros se generan a mano desde Pagos → Generar cobro.
+- **Sin duplicados:** un reintento del formulario no duplica cobros: si ya existe un cobro del mismo atleta, concepto, mes y año, se omite.
+- **Interfaz:** sección "Plan de cobros" al final de Nuevo Atleta (casilla marcada por defecto + cantidad de mensualidades, con los montos de Conceptos visibles). El listado de atletas confirma cuántos cobros se generaron, y avisa si faltó un concepto o si el plan falló.
+- El representante ve los cobros en "Mis pagos" y los reporta por el flujo normal (referencia, método, fecha y comprobante).
+
+**Archivos involucrados:**
+
+- `models/PaymentWorkflow.php` — nuevos métodos `planConcepts()` y `createEnrollmentPlan()` (única vía de creación de cobros del plan, con transacción y deduplicación)
+- `controllers/AthletesController.php` — genera el plan después de crear el atleta; un fallo nunca revierte la inscripción
+- `views/athletes/create.php` — sección "Plan de cobros" (casilla y cantidad de mensualidades)
+- `views/athletes/index.php` — aviso con el resultado del plan (cobros generados / concepto faltante / plan fallido)
+
+### 🔧 Corrección: falsos errores "al crear" con el registro ya creado
+
+- `Model::create()` devolvía `lastInsertId()` crudo: si la consulta no generaba id devolvía `"0"` (falsy) y el controlador mostraba "Error al crear…" **con la fila ya insertada**. Ahora el CREATE exitoso devuelve el id como entero, o `true` cuando la tabla no genera id: nunca un valor falsy.
+- `Athlete::createAthlete()` devuelve `id: null` si no hay id generado, para que el estatus inicial y el envío de planilla nunca se escriban contra un id falso.
+
+### 🔧 Mejora: mensaje de error específico por rol al crear cuentas
+
+El error de `AdminsController::create` decía siempre "Error al crear el administrador" aunque la cuenta fuera de un representante (causa habitual de confusión: el mensaje con la fila ya creada). Ahora nombra el rol: "Error al crear la cuenta de representante/secretario/entrenador/administrador".
+
+### 🛡️ Prevención: bloqueo global del doble envío de formularios
+
+- `views/layouts/main.php`: al enviar CUALQUIER formulario nativo se desactivan sus botones submit (la causa más común de registros duplicados es el doble clic con respuesta lenta).
+- Considera el flujo existente: si otra validación cancela el envío con `preventDefault`, los botones quedan libres para reintentar; al volver atrás desde la cache del navegador (bfcache) se reactivan. No interfiere con formularios enviados por `form.submit()` programático ni con las peticiones AJAX (borrado, autocompletado, keepalive).
+
+### 📄 Mejora de PDF: título del documento más visible
+
+El nombre del reporte en el encabezado de todos los PDF (historial de pagos, planilla, recibo, solvencia, constancia, lista, reporte financiero) pasó de 13px a **18px negrita**; la Ficha del Atleta también (14px → 18px). `views/assets/css/pdf.css`.
+
+### 🗄️ Base de datos: esquema de referencia re-importado
+
+El esquema local quedó desfasado del flujo de pagos (causa de los síntomas del punto de solución de problemas "El cobro se crea pero sale error"): se re-importó `database/escuela_beisbol_maporal.sql` completo (19 tablas + 2 vistas, todo el flujo nuevo, `payment_history` y `send_log` con PK y auto_increment). Ver la nueva entrada de Solución de Problemas para diagnosticar y repetir este paso en otra instalación.
+
+---
+
 ## 🔮 Próximas Características (Roadmap)
 
 ### Planificadas para v1.2.0
@@ -2232,7 +2294,7 @@ CREATE TABLE tournament_participants (
 - [ ] Galería de fotos de eventos
 - [ ] Estadísticas de rendimiento deportivo
 
-### Planificadas para v1.3.0
+### Planificadas para v1.4.0
 
 - [ ] API REST completa
 - [ ] Aplicación móvil
@@ -2261,6 +2323,18 @@ CREATE TABLE tournament_participants (
 - Verificar credenciales en `config/database.php`
 - Verificar que la base de datos existe
 - Verificar que se ejecutaron todos los scripts SQL
+
+### El cobro se crea pero sale error, o reportar un pago no hace nada
+
+Síntomas: al generar un cobro se muestra un mensaje de error (y el listado de pagos puede fallar con un fatal PHP), pero el cobro SÍ quedó creado; al representante reportar un pago no le cambia el estado; o al crear una cuenta sale error pero la cuenta existe. El log (`C:\xampp\apache\logs\error.log`) muestra `Unknown column 'reported_by'/'p.concept_id'` o `Table 'payment_concepts' doesn't exist`.
+
+**Causa:** la base de datos está en un esquema ANTERIOR al flujo de pagos (faltan columnas de `payments`, o `payment_history`/`send_log` sin clave primaria ni auto_increment).
+
+**Solución:**
+
+- En phpMyAdmin verificar: `payments` con columnas `concept_id`, `reported_by`, `reported_at`, `reviewed_by`, `reviewed_at`, `review_comment`, `reference_number`, `payment_method` y `status` como ENUM (`pending`, `in_review`, `approved`, `rejected`)
+- Verificar que `payment_history`, `send_log` y el resto de tablas tienen `id` AUTO_INCREMENT con PRIMARY KEY
+- Si el esquema no coincide: hacer **backup local** (`mysqldump`) y luego importar completo `database/escuela_beisbol_maporal.sql` (referencia del esquema correcto), recreando la base de datos antes si el dump trae `CREATE TABLE` sin `DROP`
 
 ### Sesión expira muy rápido
 
