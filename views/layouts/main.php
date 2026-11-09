@@ -458,6 +458,46 @@
             });
         })();
         <?php endif; ?>
+
+        // Bloqueo contra el doble envio de formularios: al enviar un formulario nativo se desactivan
+        // sus botones submit, para que un doble clic (o un reintento con respuesta lenta) no cree el
+        // registro dos veces. Si otra validacion cancela el envio con preventDefault se dejan libres,
+        // y al volver atras desde la cache del navegador (bfcache) se reactivan para poder reintentar.
+        (function() {
+            var guardButtons = function(form) {
+                return form.querySelectorAll('button[type="submit"], button:not([type]), input[type="submit"]');
+            };
+
+            document.addEventListener('submit', function(e) {
+                var form = e.target;
+                if (!(form instanceof HTMLFormElement) || form.dataset.guardSubmit !== undefined) return;
+                form.dataset.guardSubmit = '1';
+                setTimeout(function() {
+                    if (e.defaultPrevented) {
+                        delete form.dataset.guardSubmit;
+                        return;
+                    }
+                    guardButtons(form).forEach(function(btn) {
+                        if (btn.disabled) return;
+                        btn.disabled = true;
+                        btn.dataset.guardLocked = '1';
+                    });
+                }, 0);
+            });
+
+            window.addEventListener('pageshow', function(e) {
+                if (!e.persisted) return;
+                document.querySelectorAll('form[data-guard-submit]').forEach(function(form) {
+                    delete form.dataset.guardSubmit;
+                    guardButtons(form).forEach(function(btn) {
+                        if (btn.dataset.guardLocked === '1') {
+                            btn.disabled = false;
+                            delete btn.dataset.guardLocked;
+                        }
+                    });
+                });
+            });
+        })();
     </script>
 </body>
 </html>

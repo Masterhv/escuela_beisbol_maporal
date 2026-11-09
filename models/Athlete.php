@@ -215,7 +215,9 @@ class Athlete extends Model {
      */
     public function createAthlete($data) {
         $id = $this->create($data);
-        return ['success' => (bool)$id, 'id' => $id];
+        // id real solo si la tabla lo genero (AUTO_INCREMENT); null si la fila se inserto sin id,
+        // para que el controlador nunca escriba (estatus inicial, planilla) contra un id falso.
+        return ['success' => $id !== false, 'id' => (is_int($id) && $id > 0) ? $id : null];
     }
 
     /**

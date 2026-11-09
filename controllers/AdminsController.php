@@ -102,7 +102,10 @@ class AdminsController extends Controller {
                 if ($this->model->createAdmin($data)) {
                     $this->redirect('admins?success=created');
                 } else {
-                    $error = "Error al crear el administrador";
+                    // El mensaje nombra el rol de la cuenta que se intento crear (representante,
+                    // secretario...): antes siempre decia "el administrador" y confundia al crear representantes.
+                    $roleNames = ['administrador' => 'administrador', 'secretario' => 'secretario', 'entrenador' => 'entrenador', 'representante' => 'representante'];
+                    $error = "Error al crear la cuenta de " . ($roleNames[$data['role']] ?? 'usuario') . ". Intente de nuevo.";
                 }
             }
         }

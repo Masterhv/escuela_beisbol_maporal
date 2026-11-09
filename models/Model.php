@@ -111,7 +111,10 @@ class Model {
      * Crea un nuevo registro en la base de datos.
      *
      * @param array $data Un array asociativo con los datos a insertar (columna => valor).
-     * @return int|false El ID del último registro insertado o false en caso de error.
+     * @return int|true|false El ID del registro insertado, true si la fila se insertó sin id
+     *                        generado (tabla sin AUTO_INCREMENT) o false en caso de error.
+     *                        Nunca devuelve 0: el INSERT exitoso debe ser siempre verdad (truthy),
+     *                        para que el controlador no muestre un falso "error al crear" con la fila ya creada.
      */
     public function create($data) {
         $columns = implode(', ', array_keys($data));
@@ -125,7 +128,8 @@ class Model {
         }
         
         if ($stmt->execute()) {
-            return $this->db->lastInsertId();
+            $id = (int) $this->db->lastInsertId();
+            return $id > 0 ? $id : true;
         }
         return false;
     }
