@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-11-2026 a las 12:20:42
+-- Tiempo de generación: 09-11-2026 a las 13:11:21
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -55,9 +55,10 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`id`, `username`, `password`, `email`, `id_card`, `birth_date`, `phone`, `address`, `emergency_contact_name`, `emergency_contact_relationship`, `emergency_contact_phone`, `full_name`, `role`, `operation_key`, `status`, `created_date`, `last_login`, `updated_at`, `reset_token`, `reset_token_expires_at`) VALUES
-(1, 'admin', '$2y$10$DsLsuKBgNC6i/eat8U0a8ebsUUm0heGOeW1aCoioFxe5TUukQ9yDe', 'beisbolmaporal@gmail.com', '24527809', '1993-04-12', '+584262747945', '1 Diciembre', 'Eurris Velázquez', 'padre', '+584245103144', 'Administrador Principal', 'administrador', '$2y$10$veJzQjPjB5EPP6NoioJPyu5wP1UsveBjU.vScg8ay6Pzufe/lmkHW', 'active', '2025-07-19 12:38:06', '2026-11-09 07:18:47', '2026-11-09 07:18:47', NULL, NULL),
+(1, 'admin', '$2y$10$DsLsuKBgNC6i/eat8U0a8ebsUUm0heGOeW1aCoioFxe5TUukQ9yDe', 'beisbolmaporal@gmail.com', '24527809', '1993-04-12', '+584262747945', '1 Diciembre', 'Eurris Velázquez', 'padre', '+584245103144', 'Administrador Principal', 'administrador', '$2y$10$veJzQjPjB5EPP6NoioJPyu5wP1UsveBjU.vScg8ay6Pzufe/lmkHW', 'active', '2025-07-19 12:38:06', '2026-11-09 08:07:57', '2026-11-09 08:07:57', NULL, NULL),
 (2, 'valeromh', '$2y$10$UUxFXWeUA.pTzPEd0t87W.925RYMOZfckdkF3.1Pn4/l697h615Rq', 'valeromh@pdvsa.com.ve', '11324654', '1969-12-05', '0424-5852482', 'Urb. Ciudad Tavacare, Sector B, Bloque 8, Apartamento 3', 'Milangela de Valero', 'Esposa', '0414-1321316', 'Miguel Alejandro Valero Piedra', 'administrador', '$2y$10$2Sl0dv5HbX6rV0tEfGKvBObzV.KWhTpITTZdz4c1LsbPWlHQBi5Xq', 'active', '2025-11-17 22:53:24', '2026-06-29 22:39:40', '2026-10-29 20:38:05', NULL, NULL),
-(147, 'rattiae', '$2y$10$l98h3d8EIcw5H8yATVlKweXZJ0H3lHTXrXj.y23Z6fxhIVbCj.oPy', 'rattiae@gmail.com', '13216548', '1960-08-12', '0414-1234567', 'Raúl Leoni', 'Luis Rojas', 'sobrino', '0422-1234567', 'Edita Rattia de Escobar', 'representante', NULL, 'active', '2026-11-09 07:08:10', '2026-11-09 07:17:36', '2026-11-09 07:17:36', NULL, NULL);
+(147, 'rattiae', '$2y$10$l98h3d8EIcw5H8yATVlKweXZJ0H3lHTXrXj.y23Z6fxhIVbCj.oPy', 'rattiae@gmail.com', '13216548', '1960-08-12', '0414-1234567', 'Raúl Leoni', 'Luis Rojas', 'sobrino', '0422-1234567', 'Edita Rattia de Escobar', 'representante', NULL, 'active', '2026-11-09 07:08:10', '2026-11-09 07:17:36', '2026-11-09 07:17:36', NULL, NULL),
+(148, 'serranosv', '$2y$10$BuwbOFKrErvbBXwPjsQutOd4/271eWEf/hYCRYOE/dwtDyf.3cER2', 'serranosv@pdvsa.com.ve', '18244234', '1980-10-11', '0416-2783977', 'Raul Leoni', 'Yadi de Serrano', 'Pareja', '0414-3223234', 'Silvanny Serrano', 'secretario', NULL, 'active', '2026-11-09 07:41:01', '2026-11-09 07:41:22', '2026-11-09 07:41:22', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -401,7 +402,11 @@ INSERT INTO `pdf_verifications` (`id`, `token`, `report_type`, `filename`, `gene
 (28, '801f887b375ef59049eb12aee731653ec6744488e474c9bff011eea0d08e390d', 'athlete_card', 'Ficha_Atleta_Jes_s_Gonz_lez.pdf', 1, 'Administrador Principal', '6b06eebbbe6c5ed1e2f48be97b14f861c2394b5aa2955d2303be91315bfefbc9', '{\"athlete_name\":\"Jesús González\",\"athlete_id_card\":34123456,\"athlete_category\":\"Infantil\",\"athlete_dob\":\"2016-08-15\",\"parent_name\":\"Mario González\",\"parent_phone\":\"0416-6549874\",\"registration_date\":\"2025-11-16\",\"generated_at\":\"04/10/2026 23:54:50\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Ficha_Atleta_Jes_s_Gonz_lez.pdf\",\"report_type\":\"athlete_card\"}', '2026-10-04 23:54:50', 4, '2026-10-13 23:31:48'),
 (39, '8c56a2673ffa016f472988b72c30ca153de706c16a5de913fd5a8a162e81f222', 'enrollment_form', 'Planilla_Inscripcion_Jes_s_Gonz_lez_13.pdf', 1, 'Administrador Principal', 'c7861a7a73fa5460351615644017125bb707b3134517017bf03b080bd2999ad6', '{\"athlete_name\":\"Jesús González\",\"athlete_id_card\":34123456,\"athlete_category\":\"Infantil\",\"parent_name\":\"Mario González\",\"registration_date\":\"2025-11-16\",\"generated_at\":\"05/10/2026 00:06:56\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Planilla_Inscripcion_Jes_s_Gonz_lez_13.pdf\",\"report_type\":\"enrollment_form\"}', '2026-10-05 00:06:56', 4, '2026-10-13 23:31:48'),
 (70, 'd9708a2d5c1eefe263e65ad58979e8ac15d334fde81b532587546e5fb90ea940', 'payment_receipt', 'Recibo_Pago_Andr__s_Ramirez_5.pdf', 1, 'Administrador Principal', 'd169104dcf7dd96ce8ca748abf0d63808d9d944104b1369bb1348a88c115a3bd', '{\"payment_id\":5,\"athlete_name\":\"Andrés Ramirez\",\"parent_name\":\"Gonzalo Ramírez\",\"amount\":\"10,000.00\",\"month\":\"Diciembre\",\"year\":2025,\"payment_date\":\"2025-11-16\",\"generated_at\":\"11/10/2026 09:46:51\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Recibo_Pago_Andr__s_Ramirez_5.pdf\",\"report_type\":\"payment_receipt\"}', '2026-10-11 09:46:51', 4, '2026-10-13 23:31:48'),
-(145, 'eb4a5bbb5a06cad2339f674a6ee5f68afe1fcc28e5a49091bc533858c01e5a7e', 'membership_certificate', 'Constancia_CON-2026-0001_Jes_s_Gonz_lez.pdf', 1, 'Administrador Principal', 'b0d6502e0e3757f287cfe66c388595f8ea1a0d0ca876253a41dd7d1848db38c0', '{\"certificate_number\":\"CON-2026-0001\",\"athlete_id\":13,\"athlete_name\":\"Jesús González\",\"athlete_id_card\":34123456,\"athlete_category\":\"Infantil\",\"registration_date\":\"2025-11-16\",\"parent_name\":\"Mario González\",\"issued_at\":\"2026-10-13 23:40:07\",\"valid_until\":\"2026-11-12\",\"issued_by\":\"Administrador Principal\",\"generated_at\":\"13/10/2026 23:40:08\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Constancia_CON-2026-0001_Jes_s_Gonz_lez.pdf\",\"report_type\":\"membership_certificate\"}', '2026-10-13 23:40:08', 3, '2026-10-29 21:18:30');
+(145, 'eb4a5bbb5a06cad2339f674a6ee5f68afe1fcc28e5a49091bc533858c01e5a7e', 'membership_certificate', 'Constancia_CON-2026-0001_Jes_s_Gonz_lez.pdf', 1, 'Administrador Principal', 'b0d6502e0e3757f287cfe66c388595f8ea1a0d0ca876253a41dd7d1848db38c0', '{\"certificate_number\":\"CON-2026-0001\",\"athlete_id\":13,\"athlete_name\":\"Jesús González\",\"athlete_id_card\":34123456,\"athlete_category\":\"Infantil\",\"registration_date\":\"2025-11-16\",\"parent_name\":\"Mario González\",\"issued_at\":\"2026-10-13 23:40:07\",\"valid_until\":\"2026-11-12\",\"issued_by\":\"Administrador Principal\",\"generated_at\":\"13/10/2026 23:40:08\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Constancia_CON-2026-0001_Jes_s_Gonz_lez.pdf\",\"report_type\":\"membership_certificate\"}', '2026-10-13 23:40:08', 3, '2026-10-29 21:18:30'),
+(260, 'c005ee7bde8b22026d96685891a0d3cfcaf23cc2dbb49525d12ebfa41ad9f78e', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 1, 'Administrador Principal', '5934fbc01d60d70518e02777874570ebdc76e07d81cdc8a991565a6f7cfe3469', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:28:12\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:28:12', 0, NULL),
+(261, 'bb590a2934465afaa98647b3f989e7a8589c3697bedf89792111ad44441ba335', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 1, 'Administrador Principal', '241f171af0fede3ccf67e143f7c9dfcca9427b430dc58e63291229c72226b02e', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:28:48\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:28:48', 0, NULL),
+(262, '223c43753a42f68d03ef9a0433302820a87f68c7a961cba08521bf55520dd073', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 1, 'Administrador Principal', '1b975015255f946bb3a03a3d9fa1f438e061fe080bb6471b1aa18349218ecd65', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:35:31\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:35:31', 0, NULL),
+(263, 'c9436b0b9c94a5e249f4b2f8cc731cd801d2475339782492b97065eb434d54d3', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 148, 'Silvanny Serrano', '23aaac60136a76d0f33a208b39b59d4f9edb99892a70f5e0a4cbd8bb66a7066e', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:42:08\",\"generated_by\":\"Silvanny Serrano\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:42:08', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -767,7 +772,7 @@ ALTER TABLE `training_sessions`
 -- AUTO_INCREMENT de la tabla `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=149;
 
 --
 -- AUTO_INCREMENT de la tabla `athletes`
@@ -797,7 +802,7 @@ ALTER TABLE `membership_certificates`
 -- AUTO_INCREMENT de la tabla `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=207;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=213;
 
 --
 -- AUTO_INCREMENT de la tabla `payment_concepts`
@@ -809,13 +814,13 @@ ALTER TABLE `payment_concepts`
 -- AUTO_INCREMENT de la tabla `payment_history`
 --
 ALTER TABLE `payment_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT de la tabla `pdf_verifications`
 --
 ALTER TABLE `pdf_verifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=260;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=264;
 
 --
 -- AUTO_INCREMENT de la tabla `school_bank_account_history`
