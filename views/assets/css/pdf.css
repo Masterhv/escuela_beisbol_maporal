@@ -76,7 +76,7 @@ header h1 {
 }
 header p {
     margin: 3px 0 0 0;
-    font-size: 13px;
+    font-size: 18px;
     color: #8B1538;
     font-weight: bold;
 }
@@ -204,11 +204,11 @@ footer {
     font-weight: bold;
 }
 .pdf-athlete_card .report-header p {
-    margin: 4px 0 0 0;
-    font-size: 14px;
-    color: #8B1538;
-    font-weight: bold;
-}
+      margin: 4px 0 0 0;
+      font-size: 18px;
+      color: #8B1538;
+      font-weight: bold;
+  }
 
 /* Estructura de campos en dos columnas (ficha, planilla y recibo) */
 .pdf-athlete_card .ft,
