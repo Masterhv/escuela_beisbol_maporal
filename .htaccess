@@ -1,5 +1,23 @@
 RewriteEngine On
 
+# --- Redirección canónica y HTTPS para el dominio de producción -------------------------------------
+# Fuerza HTTPS y elimina el subdominio 'www' para consolidar en https://escueladebeisbolmenormaporal.com/
+RewriteCond %{HTTP_HOST} ^www\.escueladebeisbolmenormaporal\.com$ [NC]
+RewriteRule ^(.*)$ https://escueladebeisbolmenormaporal.com/$1 [L,R=301]
+
+RewriteCond %{HTTP_HOST} ^escueladebeisbolmenormaporal\.com$ [NC]
+RewriteCond %{HTTPS} !on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://escueladebeisbolmenormaporal.com/$1 [L,R=301]
+
+# --- Normalización de URLs (eliminar index.php de la barra de direcciones) -------------------------
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.php [NC]
+RewriteCond %{THE_REQUEST} !^[A-Z]{3,9}\ /index\.php/ [NC]
+RewriteRule ^index\.php$ / [L,R=301]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.php/(.*)\ HTTP [NC]
+RewriteRule ^index\.php/(.*)$ /$1 [L,R=301]
+
 # Permitir acceso directo a archivos estáticos en views/assets/ (en cualquier ruta de instalación: raíz o subcarpeta)
 RewriteCond %{REQUEST_URI} /views/assets/
 RewriteRule ^(.*)$ - [L]

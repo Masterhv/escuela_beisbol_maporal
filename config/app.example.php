@@ -15,8 +15,7 @@ return [
     // URL completa donde esta instalado el sistema, TERMINADA EN "/". Aparece en los QR de verificacion de los PDF y
     // en los enlaces de los correos. Un QR ya impreso apunta a la URL que habia al generarlo: cambiarla despues
     // deja de funcionar esos QR, asi que defínela BIEN antes de emitir documentos reales.
-    //   Ejemplos: 'https://escuela.ejemplo.com/'   o   'https://ejemplo.com/sistema/'
-    'base_url' => 'https://CAMBIAR-POR-TU-DOMINIO/',
+    'base_url' => 'https://escueladebeisbolmenormaporal.com/',
 
     // Ruta de la carpeta del sistema dentro del dominio (para .htaccess y recursos): '/' si esta en la raiz, '/sistema/' si
     // esta en una subcarpeta. Debe coincidir con la ruta de base_url.

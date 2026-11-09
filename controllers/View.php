@@ -59,21 +59,16 @@ class View {
      * @return string La primera parte de la URL, que representa la sección activa.
      */
     public function getActiveSection() {
-        // Replicamos la lógica del Router para obtener el controlador actual
-        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $baseUrlPath = parse_url(BASE_URL, PHP_URL_PATH);
-
-        // Elimina la parte de la URL base del path para obtener la ruta relativa
-        if ($baseUrlPath && strpos($path, $baseUrlPath) === 0) {
-            $path = substr($path, strlen($baseUrlPath) - 1);
+        if (class_exists('Router') && method_exists('Router', 'getNormalizedPath')) {
+            $path = Router::getNormalizedPath();
+        } else {
+            $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
         }
 
-        $path = $path === '' ? '/' : $path;
-
-        // La primera parte del path es el "controlador" (dashboard, athletes, payments, reports, admins, etc.)
-        $segments = explode('/', trim($path, '/'));
-        $controllerName = !empty($segments[0]) ? $segments[0] : 'dashboard';
-
-        return $controllerName;
+        $segments = array_values(array_filter(explode('/', trim($path, '/')), function($seg) {
+            return $seg !== '';
+        }));
+        
+        return !empty($segments[0]) ? strtolower($segments[0]) : 'dashboard';
     }
 }

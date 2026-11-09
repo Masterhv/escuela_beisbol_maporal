@@ -13,11 +13,15 @@
  * Tolerante a fallos: si el archivo falta o está roto, el sistema arranca en modo SEGURO (producción: errores ocultos,
  * cookies seguras) en lugar de caer o enseñar errores. El problema queda en el log del servidor.
  */
+// Detección automática del dominio oficial de producción
+$__host = $_SERVER['HTTP_HOST'] ?? '';
+$__isProductionDomain = (strpos($__host, 'escueladebeisbolmenormaporal.com') !== false);
+
 $__appDefaults = [
     'env'       => 'production',
-    'base_url'  => 'http://localhost/project/',
+    'base_url'  => $__isProductionDomain ? 'https://escueladebeisbolmenormaporal.com/' : 'http://localhost/project/',
     'base_path' => '/',
-    'https'     => false,
+    'https'     => $__isProductionDomain ? true : false,
     'hmac_key'  => '',
     'hmac_previous_keys' => [],
     'daily_send_limit_email'    => 150,
@@ -54,8 +58,8 @@ define('BASE_URL', rtrim((string)app_config('base_url'), '/') . '/');
 /** @var bool true si el sistema corre en modo local (errores visibles). Cualquier otro valor = producción. */
 define('APP_DEBUG', app_config('env') === 'local');
 
-/** @var bool true si el sitio se sirve por HTTPS (activa cookies seguras). */
-define('APP_HTTPS', (bool)app_config('https'));
+/** @var bool true si el sitio se sirve por HTTPS (activa cookies seguras). Detecta proxies (Cloudflare, cPanel, Nginx). */
+define('APP_HTTPS', (bool)app_config('https') || (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https'));
 
 /**
  * @var string Ruta absoluta al directorio raíz del proyecto en el servidor.

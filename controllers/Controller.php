@@ -37,10 +37,14 @@ class Controller {
     /**
      * Redirecciona a una URL específica dentro de la aplicación.
      *
-     * @param string $url La URL a la que se va a redireccionar.
+     * @param string $url La URL o ruta a la que se va a redireccionar.
      */
     protected function redirect($url) {
-        header('Location: ' . BASE_URL . $url);
+        if (preg_match('#^https?://#i', $url)) {
+            header('Location: ' . $url);
+        } else {
+            header('Location: ' . BASE_URL . ltrim($url, '/'));
+        }
         exit();
     }
     
