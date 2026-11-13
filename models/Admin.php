@@ -248,6 +248,21 @@ class Admin extends Model {
      * @param string $key La clave de 4 dígitos a verificar.
      * @return bool True si la clave es correcta, false en caso contrario.
      */
+    /**
+     * Indica si el administrador ya registro una clave de operaciones especiales.
+     *
+     * @param int $adminId ID del administrador.
+     * @return bool True si tiene clave registrada (no vacia).
+     */
+    public function hasOperationKey($adminId) {
+        $sql = "SELECT operation_key FROM {$this->table} WHERE id = :id AND role = 'administrador'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $adminId, PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return !empty($row['operation_key']);
+    }
+
     public function verifyOperationKey($adminId, $key) {
         $sql = "SELECT operation_key FROM {$this->table} WHERE id = :id AND role = 'administrador'";
         $stmt = $this->db->prepare($sql);

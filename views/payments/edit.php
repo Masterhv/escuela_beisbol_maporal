@@ -16,6 +16,9 @@ $months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Se
         </p>
     </div>
 
+    <?php if (isset($error)): ?>
+    <div class="pay-notice pay-notice--rejected"><p class="pay-notice__text"><?php echo htmlspecialchars($error); ?></p></div>
+    <?php endif; ?>
     <?php if ($err !== ''): ?>
     <div class="pay-notice pay-notice--rejected"><p class="pay-notice__text">Revisa los datos: concepto, mes, año, fecha y un monto mayor que cero.</p></div>
     <?php endif; ?>
@@ -63,6 +66,12 @@ $months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Se
             <div>
                 <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Notas (Opcional)</label>
                 <textarea id="notes" name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700"><?php echo htmlspecialchars($payment['notes'] ?? ''); ?></textarea>
+            </div>
+            <div class="border border-red-200 bg-red-50 rounded-lg p-4">
+                <label for="operation_key" class="block text-sm font-semibold text-gray-900 mb-1"><i class="fas fa-shield-alt text-red-700 mr-2"></i>Clave de Operaciones Especiales *</label>
+                <p class="text-xs text-gray-600 mb-2">Editar un cobro creado requiere tu clave de 4 dígitos de administrador.</p>
+                <input type="password" id="operation_key" name="operation_key" required maxlength="4" pattern="\d{4}" inputmode="numeric" placeholder="••••"
+                       class="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 tracking-widest text-center text-xl">
             </div>
             <div class="flex justify-end gap-4">
                 <a href="<?php echo BASE_URL; ?>payments/view?id=<?php echo (int)$payment['id']; ?>" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg">Cancelar</a>

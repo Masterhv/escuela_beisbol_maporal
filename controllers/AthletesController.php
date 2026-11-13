@@ -365,6 +365,12 @@ class AthletesController extends Controller {
             // Cambiar a inactivo/suspendido exige motivo (se valida antes de subir la foto).
             if ($reasonError = $this->statusReasonError($data, $Athlete['status'])) { $errors[] = $reasonError; }
 
+            // Editar un atleta ya inscrito requiere la CLAVE DE OPERACIONES ESPECIALES del administrador.
+            $opKey = trim($_POST['operation_key'] ?? '');
+            if ($_SESSION['admin_role'] !== 'administrador' || !(new Admin())->verifyOperationKey($_SESSION['admin_id'], $opKey)) {
+                $errors[] = 'Clave de operaciones especiales incorrecta o faltante.';
+            }
+
             if (!empty($errors)) {
                 $athleteData = array_merge($Athlete, $data);
                 $this->view->render('athletes/edit', [

@@ -161,6 +161,15 @@ class PaymentsController extends Controller {
         $concepts = (new PaymentConcept())->activeList();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Editar un cobro requiere la CLAVE DE OPERACIONES ESPECIALES del administrador.
+            $opKey = trim($_POST['operation_key'] ?? '');
+            if (!(new Admin())->verifyOperationKey($_SESSION['admin_id'], $opKey)) {
+                $this->view->render('payments/edit', [
+                    'payment' => $payment, 'concepts' => (new PaymentConcept())->activeList(), 'title' => 'Editar Cobro',
+                    'error' => 'Clave de operaciones especiales incorrecta o faltante.',
+                ]);
+                return;
+            }
             $conceptId = (int)($_POST['concept_id'] ?? 0);
             $concept = (new PaymentConcept())->findById($conceptId);
             $athleteId = (int)($_POST['athlete_id'] ?? 0);
@@ -197,6 +206,15 @@ class PaymentsController extends Controller {
         $payment = $this->loadAccessiblePayment($_GET['id'] ?? null);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Editar un cobro requiere la CLAVE DE OPERACIONES ESPECIALES del administrador.
+            $opKey = trim($_POST['operation_key'] ?? '');
+            if (!(new Admin())->verifyOperationKey($_SESSION['admin_id'], $opKey)) {
+                $this->view->render('payments/edit', [
+                    'payment' => $payment, 'concepts' => (new PaymentConcept())->activeList(), 'title' => 'Editar Cobro',
+                    'error' => 'Clave de operaciones especiales incorrecta o faltante.',
+                ]);
+                return;
+            }
             $conceptId = (int)($_POST['concept_id'] ?? 0);
             $concept = (new PaymentConcept())->findById($conceptId);
             $month = trim($_POST['month'] ?? '');
