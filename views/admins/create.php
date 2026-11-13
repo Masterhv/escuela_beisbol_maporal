@@ -20,10 +20,11 @@
             <div class="border-b border-gray-200 pb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Información Personal</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
-                        <input type="text" id="full_name" name="full_name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent" value="<?php echo htmlspecialchars($data['full_name'] ?? ''); ?>">
-                    </div>
+            <div>
+                <label for="full_name" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+                <input type="text" id="full_name" name="full_name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent" value="<?php echo htmlspecialchars($data['full_name'] ?? ''); ?>">
+                <p class="text-red-500 text-sm mt-1 hidden validation-error"></p>
+            </div>
                     <div>
                         <label for="id_card" class="block text-sm font-medium text-gray-700 mb-1">Cédula *</label>
                         <input type="text" id="id_card" name="id_card" required maxlength="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent" value="<?php echo htmlspecialchars($data['id_card'] ?? ''); ?>">
@@ -341,6 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Field Format Validation ---
     const validations = {
+        'full_name': { regex: /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s()-]+$/, message: 'El nombre completo solo debe contener letras y espacios.' },
         'id_card': { regex: /^[0-9]{7,8}$/, message: 'La cédula debe contener entre 7 y 8 dígitos numéricos.' },
         'phone_number': { regex: /^[0-9]{7}$/, message: 'Debe contener exactamente 7 dígitos.' },
         'emergency_contact_phone_number': { regex: /^[0-9]{7}$/, message: 'Debe contener exactamente 7 dígitos.' },
@@ -402,7 +404,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Validar formato de email
+        // Validar formato de nombre y email en el envio (por si se pego el valor y el evento input no corrio)
+        const nameInput = document.getElementById('full_name');
+        if (nameInput.value && !validations['full_name'].regex.test(nameInput.value)) {
+            errors.push('El nombre completo solo debe contener letras y espacios.');
+        }
         const emailInput = document.getElementById('email');
         if (emailInput.value && !validations['email'].regex.test(emailInput.value)) {
             errors.push('Debe ingresar un correo electrónico válido.');
