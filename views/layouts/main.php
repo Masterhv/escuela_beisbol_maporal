@@ -83,7 +83,7 @@
                             ['id' => 'training',    'label' => 'Entrenamientos',   'icon' => 'fa-calendar-alt'],
                             ['id' => 'tournaments', 'label' => 'Torneos',          'icon' => 'fa-trophy'],
                             ['id' => 'inventory',   'label' => 'Inventario',       'icon' => 'fa-boxes', 'roles' => ['administrador', 'secretario', 'entrenador']],
-                            ['id' => 'reports',     'label' => 'Reportes',         'icon' => 'fa-file-alt'],
+                            ['id' => 'reports',     'label' => 'Reportes',         'icon' => 'fa-file-alt', 'roles' => ['administrador', 'secretario', 'entrenador']],
                             ['id' => 'admins',      'label' => 'Administradores',  'icon' => 'fa-cog',   'roles' => ['administrador']],
                         ];
                         $navItems = array_values(array_filter($navAll, fn($i) => !isset($i['roles']) || in_array($role, $i['roles'], true)));
