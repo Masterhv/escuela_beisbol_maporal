@@ -266,7 +266,7 @@ $actionLabels = [
         $canApprove = in_array('approve', $actions, true);
         $canReject  = in_array('reject', $actions, true);
         $canReopen  = in_array('reopen', $actions, true);
-        $canEdit    = $isStaff && in_array($status, ['pending', 'rejected'], true);
+        $canEdit    = $role === 'administrador' && in_array($status, ['pending', 'rejected'], true); // editar cobros: solo administrador
         // Quien registro el pago no puede conciliarlo (secretario o administrador): se le explica por que no hay botones.
         $selfNote   = in_array($role, ['secretario', 'administrador'], true) && $status === 'in_review' && !$canApprove && (int)($payment['reported_by'] ?? 0) === (int)$_SESSION['admin_id'];
         ?>

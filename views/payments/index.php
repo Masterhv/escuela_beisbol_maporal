@@ -195,7 +195,7 @@
                                             <i class="fas fa-clipboard-check"></i>
                                         </a>
                                     <?php endif; ?>
-                                    <?php if ($isStaffRow && in_array($payment['status'], ['pending', 'rejected'], true)): ?>
+                                    <?php if ($_SESSION['admin_role'] === 'administrador' && in_array($payment['status'], ['pending', 'rejected'], true)): ?>
                                         <a href="<?php echo BASE_URL; ?>payments/edit?id=<?php echo $payment['id']; ?>" class="text-red-600 hover:text-red-800 p-1" title="Editar cobro">
                                             <i class="fas fa-edit"></i>
                                         </a>

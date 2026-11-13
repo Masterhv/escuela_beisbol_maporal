@@ -193,7 +193,7 @@ class PaymentsController extends Controller {
 
     /** Edita los datos de un cobro. Solo mientras esta Pendiente o Rechazado; nunca cambia el estado. */
     public function edit() {
-        $this->requireRole(['administrador', 'secretario']);
+        $this->requireRole(['administrador']); // Editar cobros: solo administrador
         $payment = $this->loadAccessiblePayment($_GET['id'] ?? null);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
