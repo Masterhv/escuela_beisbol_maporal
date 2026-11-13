@@ -214,6 +214,34 @@
                     </div>
                     
                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento *</label>
+                        <input
+                            type="date"
+                            name="account_birth_date"
+                            id="account_birth_date"
+                            required
+                            value="<?php echo htmlspecialchars($Athlete['account_birth_date'] ?? ''); ?>"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Edad *</label>
+                        <input
+                            type="number"
+                            name="parent_age"
+                            id="parent_age"
+                            min="18"
+                            max="100"
+                            required
+                            value="<?php echo htmlspecialchars($Athlete['parent_age'] ?? ''); ?>"
+                            readonly
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent bg-gray-100"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">Se calcula sola de la fecha de nacimiento. Debe ser mayor de 18 a&ntilde;os.</p>
+                        <p id="parent-age-error" class="text-red-500 text-sm mt-1 hidden"></p>
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
                         <div class="flex gap-2">
                             <select
@@ -347,18 +375,6 @@
                 <h3 class="text-lg font-medium text-gray-900 mb-1">Cuenta de acceso del representante <span class="text-red-600">*</span></h3>
                 <p class="text-sm text-gray-600 mb-4">La cuenta se crea <strong>siempre</strong> en este mismo paso, usando el nombre, c&eacute;dula, tel&eacute;fono, correo, direcci&oacute;n y contacto de emergencia ya escritos arriba. Si el representante ya tiene cuenta (otro atleta inscrito antes), se reutiliza y no se pide nada de esto.</p>
                 <div id="account-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento del Representante *</label>
-                        <input
-                            type="date"
-                            name="account_birth_date"
-                            id="account_birth_date"
-                            required
-                            value="<?php echo htmlspecialchars($Athlete['account_birth_date'] ?? ''); ?>"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                        >
-                        <p class="text-xs text-gray-500 mt-1">Debe ser mayor de 18 a&ntilde;os.</p>
-                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario *</label>
                         <div class="flex gap-2">
@@ -758,6 +774,25 @@ document.addEventListener('DOMContentLoaded', function() {
             if (digits.length >= 3) { user += digits.slice(-3); }
             const input = document.getElementById('account_username');
             if (user && input) { input.value = user.slice(0, 30); }
+        });
+    }
+
+    // --- Edad del representante: se calcula de su fecha de nacimiento, como la del atleta ---
+    const parentBirthInput = document.getElementById('account_birth_date');
+    const parentAgeInput = document.getElementById('parent_age');
+    const parentAgeError = document.getElementById('parent-age-error');
+    if (parentBirthInput && parentAgeInput) {
+        parentBirthInput.addEventListener('input', function () {
+            if (this.value) {
+                const age = calculateAge(this.value);
+                parentAgeInput.value = age > 0 && age < 150 ? age : '';
+                const underAge = age < 18;
+                parentAgeError.textContent = underAge ? 'El representante debe ser mayor de 18 años.' : '';
+                parentAgeError.classList.toggle('hidden', !underAge);
+            } else {
+                parentAgeInput.value = '';
+                parentAgeError.classList.add('hidden');
+            }
         });
     }
 
