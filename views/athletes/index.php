@@ -14,7 +14,7 @@
                 <i class="fas fa-download"></i>
                 Descargar planilla en blanco
             </a>
-            <?php if (in_array($_SESSION['admin_role'], ['administrador', 'secretario'])): ?>
+            <?php if ($_SESSION['admin_role'] === 'administrador'): ?>
             <a href="<?php echo BASE_URL; ?>athletes/create" class="btn-primary text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
                 <i class="fas fa-plus"></i>
                 Nuevo Atleta
@@ -259,7 +259,7 @@
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     
-                                    <?php if (in_array($_SESSION['admin_role'], ['administrador', 'secretario'])): ?>
+                                    <?php if ($_SESSION['admin_role'] === 'administrador'): ?>
                                     <a href="<?php echo BASE_URL; ?>athletes/edit?id=<?php echo $Athlete['id']; ?>"
                                        class="text-red-600 hover:text-red-800 p-1" title="Editar">
                                         <i class="fas fa-edit"></i>

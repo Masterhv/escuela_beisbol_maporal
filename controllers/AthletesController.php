@@ -221,7 +221,7 @@ class AthletesController extends Controller {
      * Requiere rol de 'administrador' o 'secretario'.
      */
     public function create() {
-        $this->requireRole(['administrador', 'secretario']); // Administrador y secretario pueden crear
+        $this->requireRole(['administrador']); // Solo administrador puede inscribir/editar atletas
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $_POST;
@@ -356,7 +356,7 @@ class AthletesController extends Controller {
      * Requiere rol de 'administrador' o 'secretario'.
      */
     public function edit() {
-        $this->requireRole(['administrador', 'secretario']); // Administrador y secretario pueden editar
+        $this->requireRole(['administrador']); // Solo administrador puede inscribir/editar atletas
         
         $id = $_GET['id'] ?? null;
         if (!$id) $this->redirect('athletes?error=not_found');
@@ -829,7 +829,7 @@ class AthletesController extends Controller {
      * POST (AJAX). Requiere rol de 'administrador' o 'secretario'.
      */
     public function resendEnrollmentEmail() {
-        $this->requireRole(['administrador', 'secretario']);
+        $this->requireRole(['administrador']); // Solo administrador: parte del flujo de inscripcion
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
@@ -855,7 +855,7 @@ class AthletesController extends Controller {
      * POST (AJAX). Requiere rol de 'administrador' o 'secretario'.
      */
     public function resendEnrollmentWhatsApp() {
-        $this->requireRole(['administrador', 'secretario']);
+        $this->requireRole(['administrador']); // Solo administrador: parte del flujo de inscripcion
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
