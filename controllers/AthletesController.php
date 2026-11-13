@@ -60,7 +60,6 @@ class AthletesController extends Controller {
         $birthDate = trim($data['account_birth_date'] ?? '');
         $username = trim($data['account_username'] ?? '');
         $password = (string)($data['account_password'] ?? '');
-        $confirm = (string)($data['account_password_confirm'] ?? '');
         $relationship = trim($data['account_emergency_relationship'] ?? '');
 
         if ($birthDate === '') {
@@ -89,11 +88,7 @@ class AthletesController extends Controller {
             $errors[] = 'El correo electronico ya esta registrado con otra cuenta del sistema.';
         }
 
-        if ($password !== $confirm) {
-            $errors[] = 'Las contrasenas no coinciden.';
-        } else {
-            $errors = array_merge($errors, AdminsController::validatePasswordStrength($password));
-        }
+        $errors = array_merge($errors, AdminsController::validatePasswordStrength($password));
 
         if ($relationship === '') {
             $errors[] = 'Indica el parentesco del contacto de emergencia (se guarda en la cuenta).';

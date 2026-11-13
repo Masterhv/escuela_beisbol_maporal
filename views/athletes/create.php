@@ -412,20 +412,6 @@
                             <div id="acct-pw-symbol" class="text-gray-500"><i class="fas fa-times-circle mr-2"></i>Un s&iacute;mbolo (!@#$%^&amp;*)</div>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contrase&ntilde;a *</label>
-                        <div class="relative">
-                            <input type="password" name="account_password_confirm" id="account_password_confirm" required minlength="8"
-                                   value="<?php echo htmlspecialchars($Athlete['account_password_confirm'] ?? ''); ?>"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent pr-32">
-                            <div class="absolute inset-y-0 right-0 flex items-center">
-                                <button type="button" id="toggle-account-password-confirm" class="px-3 text-gray-500">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <p id="account-password-mismatch" class="text-red-500 text-sm mt-1 hidden">Las contrase&ntilde;as no coinciden.</p>
-                    </div>
                 </div>
             </div>
 
@@ -717,8 +703,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const BASE_URL_JS = '<?php echo BASE_URL; ?>';
     const idCardInput = document.getElementById('parent_id_card');
     const fields = document.getElementById('account-fields');
-    const ids = ['account_birth_date', 'account_username', 'account_password', 'account_password_confirm', 'account_emergency_relationship'];
-    const newOnly = ['account_birth_date', 'account_username', 'account_password', 'account_password_confirm', 'account_emergency_relationship'];
+    const ids = ['account_birth_date', 'account_username', 'account_password', 'account_emergency_relationship'];
+    const newOnly = ['account_birth_date', 'account_username', 'account_password', 'account_emergency_relationship'];
     const hintId = 'account-existing-hint';
     let lastChecked = null;
 
@@ -798,8 +784,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Contraseña de la cuenta: checklist en vivo, Generar y ojo (igual que en Administradores) ---
     const acctPwInput = document.getElementById('account_password');
-    const acctPwConfirm = document.getElementById('account_password_confirm');
-    const acctPwMismatch = document.getElementById('account-password-mismatch');
     const acctPwCriteria = {
         length: document.getElementById('acct-pw-length'),
         uppercase: document.getElementById('acct-pw-uppercase'),
@@ -831,9 +815,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 el.innerHTML = el.innerHTML.replace('fa-check-circle', 'fa-times-circle');
             }
         }
-        if (acctPwMismatch) {
-            acctPwMismatch.classList.toggle('hidden', !acctPwConfirm.value || acctPwConfirm.value === value);
-        }
         return strength === 5;
     }
     if (acctPwInput) { acctPwInput.addEventListener('input', validateAccountPassword); }
@@ -853,7 +834,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    [['toggle-account-password', acctPwInput], ['toggle-account-password-confirm', acctPwConfirm]].forEach(function ([toggleId, input]) {
+    [['toggle-account-password', acctPwInput]].forEach(function ([toggleId, input]) {
         const btnToggle = document.getElementById(toggleId);
         if (btnToggle && input) {
             btnToggle.addEventListener('click', function () {
