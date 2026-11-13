@@ -142,6 +142,21 @@ class Admin extends Model {
      * @param int|null $excludeId Un ID de administrador a excluir de la búsqueda.
      * @return bool True si la cédula ya existe, false si no.
      */
+    /**
+     * Busca un administrador por su cedula (acceso por vinculo representante-atletia).
+     *
+     * @param string $idCard Cedula a buscar.
+     * @return array|null Fila del administrador o null si no existe.
+     */
+    public function findByIdCard($idCard) {
+        $sql = "SELECT * FROM {$this->table} WHERE id_card = :id_card LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id_card', $idCard);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
     public function isIdCardTaken($id_card, $excludeId = null) {
         if (empty($id_card)) {
             return false;

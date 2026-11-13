@@ -1087,7 +1087,19 @@ class AthletesController extends Controller {
             exit;
         }
 
-        echo json_encode(['exists' => (new Admin())->isIdCardTaken($idCard)]);
+        // Con la cuenta encontrada devuelve tambien nombre y usuario: el formulario muestra
+        // el aviso en tiempo real con los datos exactos del representante reutilizado.
+        $adminModel = new Admin();
+        if (!$adminModel->isIdCardTaken($idCard)) {
+            echo json_encode(['exists' => false]);
+            exit;
+        }
+        $rep = $adminModel->findByIdCard($idCard);
+        echo json_encode([
+            'exists'   => true,
+            'username' => $rep['username'] ?? '',
+            'full_name'=> $rep['full_name'] ?? '',
+        ]);
         exit;
     }
 

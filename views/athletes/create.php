@@ -708,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const hintId = 'account-existing-hint';
     let lastChecked = null;
 
-    function setExisting(isExisting) {
+    function setExisting(isExisting, repName, repUser) {
         if (!fields) return;
         fields.classList.toggle('hidden', isExisting);
         newOnly.forEach(function (id) {
@@ -719,28 +719,42 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         let hint = document.getElementById(hintId);
-        if (isExisting && !hint && fields.parentNode) {
-            hint = document.createElement('p');
-            hint.id = hintId;
-            hint.className = 'text-sm text-green-700 mt-2';
-            hint.textContent = 'Este representante ya tiene cuenta de acceso: se reutilizará y no se creará otra. Solo complete los datos del atleta.';
-            fields.parentNode.insertBefore(hint, fields.nextSibling);
-        } else if (!isExisting && hint) {
+        if (isExisting) {
+            if (!hint && fields.parentNode) {
+                hint = document.createElement('div');
+                hint.id = hintId;
+                fields.parentNode.insertBefore(hint, fields.nextSibling);
+            }
+            const nombre = repName ? repName : 'Este representante';
+            const usuario = repUser ? '<span style="font-family:monospace;font-weight:700;">' + repUser + '</span>' : 'su cuenta actual';
+            hint.className = 'mt-3 flex items-start gap-3 bg-blue-50 border border-blue-300 rounded-lg p-3';
+            hint.innerHTML =
+                '<i class="fas fa-user-check text-blue-700 mt-0.5"></i>' +
+                '<div class="text-sm"><strong class="text-blue-900">' + nombre + ' ya tiene cuenta de acceso (usuario ' + usuario + ').</strong>' +
+                '<p class="text-blue-800 mt-0.5">NO se creará otra cuenta: al guardar, el hermano quedará ligado a la misma. Continúe con el registro normalmente.</p></div>';
+        } else if (hint) {
             hint.remove();
         }
     }
 
     if (idCardInput && fields) {
-        idCardInput.addEventListener('change', function () {
+        // Chequeo en TIEMPO REAL mientras se escribe la cedula (con pausa de 350ms entre tecleos).
+        let debounceTimer = null;
+        function checkRep() {
             const digits = (idCardInput.value || '').replace(/\D/g, '');
             if (digits.length < 7) { lastChecked = null; setExisting(false); return; }
             if (lastChecked === digits) return;
             lastChecked = digits;
             fetch(BASE_URL_JS + 'athletes/checkRepresentativeAccount?id_card=' + encodeURIComponent(digits))
                 .then(function (r) { return r.json(); })
-                .then(function (data) { setExisting(!!data.exists); })
+                .then(function (data) { setExisting(!!data.exists, data.full_name, data.username); })
                 .catch(function () { setExisting(false); });
+        }
+        idCardInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(checkRep, 350);
         });
+        idCardInput.addEventListener('change', checkRep);
     }
 
     const btn = document.getElementById('suggest_username');
