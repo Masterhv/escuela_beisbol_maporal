@@ -365,19 +365,40 @@
                             <button type="button" id="suggest_username" class="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Sugerir</button>
                         </div>
                         <p class="text-xs text-gray-500 mt-1">Letras, n&uacute;meros, punto, guion y guion bajo. 3 a 30 caracteres. La sugerencia arma: apellido + inicial del nombre + &uacute;ltimos 3 d&iacute;gitos de la c&eacute;dula.</p>
-                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Contrase&ntilde;a *</label>
-                        <input
-                            type="password"
-                            name="account_password"
-                            id="account_password"
-                            required
-                            minlength="8"
-                            value="<?php echo htmlspecialchars($Athlete['account_password'] ?? ''); ?>"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                        >
-                        <p class="text-xs text-gray-500 mt-1">M&iacute;nimo 8 caracteres, con may&uacute;scula, min&uacute;scula, n&uacute;mero y s&iacute;mbolo (!@#$%^&amp;*).</p>
+                        <div class="relative">
+                            <input type="password" name="account_password" id="account_password" required minlength="8"
+                                   value="<?php echo htmlspecialchars($Athlete['account_password'] ?? ''); ?>"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent pr-32">
+                            <div class="absolute inset-y-0 right-0 flex items-center">
+                                <button type="button" id="toggle-account-password" class="px-3 text-gray-500">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" id="generate-account-password" class="px-3 text-sm text-gray-700 hover:text-gray-900 border-l border-gray-300">Generar</button>
+                            </div>
+                        </div>
+                        <div id="account-password-strength" class="mt-2 space-y-1 text-sm">
+                            <div id="acct-pw-length" class="text-gray-500"><i class="fas fa-times-circle mr-2"></i>M&iacute;nimo 8 caracteres</div>
+                            <div id="acct-pw-uppercase" class="text-gray-500"><i class="fas fa-times-circle mr-2"></i>Una letra may&uacute;scula</div>
+                            <div id="acct-pw-lowercase" class="text-gray-500"><i class="fas fa-times-circle mr-2"></i>Una letra min&uacute;scula</div>
+                            <div id="acct-pw-number" class="text-gray-500"><i class="fas fa-times-circle mr-2"></i>Un n&uacute;mero</div>
+                            <div id="acct-pw-symbol" class="text-gray-500"><i class="fas fa-times-circle mr-2"></i>Un s&iacute;mbolo (!@#$%^&amp;*)</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contrase&ntilde;a *</label>
+                        <div class="relative">
+                            <input type="password" name="account_password_confirm" id="account_password_confirm" required minlength="8"
+                                   value="<?php echo htmlspecialchars($Athlete['account_password_confirm'] ?? ''); ?>"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent pr-32">
+                            <div class="absolute inset-y-0 right-0 flex items-center">
+                                <button type="button" id="toggle-account-password-confirm" class="px-3 text-gray-500">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p id="account-password-mismatch" class="text-red-500 text-sm mt-1 hidden">Las contrase&ntilde;as no coinciden.</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contrase&ntilde;a *</label>
@@ -755,5 +776,74 @@ document.addEventListener('DOMContentLoaded', function() {
             if (user && input) { input.value = user.slice(0, 30); }
         });
     }
+
+    // --- Contraseña de la cuenta: checklist en vivo, Generar y ojo (igual que en Administradores) ---
+    const acctPwInput = document.getElementById('account_password');
+    const acctPwConfirm = document.getElementById('account_password_confirm');
+    const acctPwMismatch = document.getElementById('account-password-mismatch');
+    const acctPwCriteria = {
+        length: document.getElementById('acct-pw-length'),
+        uppercase: document.getElementById('acct-pw-uppercase'),
+        lowercase: document.getElementById('acct-pw-lowercase'),
+        number: document.getElementById('acct-pw-number'),
+        symbol: document.getElementById('acct-pw-symbol')
+    };
+
+    function validateAccountPassword() {
+        if (!acctPwInput) return false;
+        const value = acctPwInput.value;
+        const criteria = {
+            length: value.length >= 8,
+            uppercase: /[A-Z]/.test(value),
+            lowercase: /[a-z]/.test(value),
+            number: /[0-9]/.test(value),
+            symbol: /[!@#$%^&*]/.test(value)
+        };
+        let strength = 0;
+        for (const key in criteria) {
+            const el = acctPwCriteria[key];
+            if (!el) continue;
+            if (criteria[key]) {
+                el.classList.replace('text-gray-500', 'text-green-600');
+                el.innerHTML = el.innerHTML.replace('fa-times-circle', 'fa-check-circle');
+                strength++;
+            } else {
+                el.classList.replace('text-green-600', 'text-gray-500');
+                el.innerHTML = el.innerHTML.replace('fa-check-circle', 'fa-times-circle');
+            }
+        }
+        if (acctPwMismatch) {
+            acctPwMismatch.classList.toggle('hidden', !acctPwConfirm.value || acctPwConfirm.value === value);
+        }
+        return strength === 5;
+    }
+    if (acctPwInput) { acctPwInput.addEventListener('input', validateAccountPassword); }
+    if (acctPwConfirm) { acctPwConfirm.addEventListener('input', validateAccountPassword); }
+
+    const generateAcctPwBtn = document.getElementById('generate-account-password');
+    if (generateAcctPwBtn) {
+        generateAcctPwBtn.addEventListener('click', function () {
+            const length = 12;
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+            let password = "";
+            for (let i = 0, n = charset.length; i < length; ++i) {
+                password += charset.charAt(Math.floor(Math.random() * n));
+            }
+            acctPwInput.value = password;
+            validateAccountPassword();
+        });
+    }
+
+    [['toggle-account-password', acctPwInput], ['toggle-account-password-confirm', acctPwConfirm]].forEach(function ([toggleId, input]) {
+        const btnToggle = document.getElementById(toggleId);
+        if (btnToggle && input) {
+            btnToggle.addEventListener('click', function () {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        }
+    });
 })();
 </script>
