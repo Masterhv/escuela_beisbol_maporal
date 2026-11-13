@@ -189,19 +189,19 @@ $actionLabels = [
                 <p class="bank-card__hint">Deposita o transfiere el monto de este cobro (<strong>Bs. <?php echo number_format($payment['amount'], 2); ?></strong>) a una de estas cuentas y luego registra aquí la referencia y el comprobante.</p>
                 <dl class="bank-card__grid">
                     <?php if (!empty($bank['holder_name'])): ?>
-                    <div><dt>Titular</dt><dd><?php echo htmlspecialchars($bank['holder_name']); ?></dd></div>
+                    <div><dt>Titular</dt><dd class="bank-copy-value copy-holder-name"><?php echo htmlspecialchars($bank['holder_name']); ?></dd><button type="button" class="bank-copy" data-copy-target=".copy-holder-name" title="Copiar"><i class="fas fa-copy"></i><span>Copiar</span></button></div>
                     <?php endif; ?>
                     <?php if (!empty($bank['holder_id'])): ?>
-                    <div><dt>Cédula / RIF</dt><dd><?php echo htmlspecialchars($bank['holder_id']); ?></dd></div>
+                    <div><dt>Cédula / RIF</dt><dd class="bank-card__mono bank-copy-value copy-holder-id"><?php echo htmlspecialchars($bank['holder_id']); ?></dd><button type="button" class="bank-copy" data-copy-target=".copy-holder-id" title="Copiar"><i class="fas fa-copy"></i><span>Copiar</span></button></div>
                     <?php endif; ?>
                 </dl>
                 <?php if (SchoolBankAccount::hasTransfer($bank)): ?>
                 <div class="bank-card__method">
                     <p class="bank-card__method-title">Transferencia bancaria</p>
                     <dl class="bank-card__grid">
-                        <div><dt>Banco</dt><dd><?php echo htmlspecialchars($bank['bank_name']); ?></dd></div>
+                        <div><dt>Banco</dt><dd class="bank-copy-value copy-bank-name"><?php echo htmlspecialchars($bank['bank_name']); ?></dd><button type="button" class="bank-copy" data-copy-target=".copy-bank-name" title="Copiar"><i class="fas fa-copy"></i><span>Copiar</span></button></div>
                         <div><dt>Tipo de cuenta</dt><dd><?php echo htmlspecialchars(ucfirst((string)$bank['account_type'])); ?></dd></div>
-                        <div class="bank-card__wide"><dt>N.° de cuenta</dt><dd class="bank-card__mono"><?php echo htmlspecialchars($bank['account_number']); ?></dd></div>
+                        <div class="bank-card__wide"><dt>N.° de cuenta</dt><dd class="bank-card__mono bank-copy-value copy-account-number"><?php echo htmlspecialchars($bank['account_number']); ?></dd><button type="button" class="bank-copy" data-copy-target=".copy-account-number" title="Copiar"><i class="fas fa-copy"></i><span>Copiar</span></button></div>
                     </dl>
                 </div>
                 <?php endif; ?>
@@ -210,8 +210,8 @@ $actionLabels = [
                     <p class="bank-card__method-title">Pago móvil</p>
                     <dl class="bank-card__grid">
                         <div><dt>Banco</dt><dd><?php echo htmlspecialchars($bank['mobile_bank']); ?></dd></div>
-                        <div><dt>Teléfono</dt><dd class="bank-card__mono"><?php echo htmlspecialchars($bank['mobile_phone']); ?></dd></div>
-                        <div><dt>Cédula / RIF</dt><dd class="bank-card__mono"><?php echo htmlspecialchars($bank['mobile_id']); ?></dd></div>
+                        <div><dt>Teléfono</dt><dd class="bank-card__mono bank-copy-value copy-mobile-phone"><?php echo htmlspecialchars($bank['mobile_phone']); ?></dd><button type="button" class="bank-copy" data-copy-target=".copy-mobile-phone" title="Copiar"><i class="fas fa-copy"></i><span>Copiar</span></button></div>
+                        <div><dt>Cédula / RIF</dt><dd class="bank-card__mono bank-copy-value copy-mobile-id"><?php echo htmlspecialchars($bank['mobile_id']); ?></dd><button type="button" class="bank-copy" data-copy-target=".copy-mobile-id" title="Copiar"><i class="fas fa-copy"></i><span>Copiar</span></button></div>
                     </dl>
                 </div>
                 <?php endif; ?>
@@ -345,6 +345,62 @@ $actionLabels = [
     input.addEventListener('input', clean);
     input.addEventListener('paste', function () { setTimeout(clean, 0); });
     input.addEventListener('keypress', function (e) { if (e.key.length === 1 && !/[0-9]/.test(e.key) && !e.ctrlKey && !e.metaKey) { e.preventDefault(); } });
+})();
+
+// --- Copiar datos bancarios (estilo Cashea): cada dato tiene su boton Copiar ---
+(function () {
+    let toastTimer = null;
+    function toast(msg) {
+        let t = document.getElementById('bank-copy-toast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'bank-copy-toast';
+            t.className = 'bank-copy-toast';
+            document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.classList.add('bank-copy-toast--show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { t.classList.remove('bank-copy-toast--show'); }, 2200);
+    }
+
+    function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+        // Fallback sin HTTPS (XAMPP local): textarea oculto + execCommand
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) { return Promise.reject(e); }
+        document.body.removeChild(ta);
+        return Promise.resolve();
+    }
+
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.bank-copy');
+        if (!btn) return;
+        const valueEl = document.querySelector(btn.dataset.copyTarget);
+        if (!valueEl) return;
+        copyText(valueEl.textContent.trim()).then(function () {
+            const label = btn.querySelector('span');
+            const icon = btn.querySelector('i');
+            btn.classList.add('bank-copy--done');
+            if (label) label.textContent = '¡Copiado!';
+            if (icon) { icon.classList.replace('fa-copy', 'fa-check'); }
+            toast('Copiado: ' + valueEl.textContent.trim());
+            setTimeout(function () {
+                btn.classList.remove('bank-copy--done');
+                if (label) label.textContent = 'Copiar';
+                if (icon) { icon.classList.replace('fa-check', 'fa-copy'); }
+            }, 2200);
+        }).catch(function () {
+            toast('No se pudo copiar automáticamente; selecciónalo y copia manualmente.');
+        });
+    });
 })();
 </script>
 <script>

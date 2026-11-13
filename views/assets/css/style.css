@@ -1407,6 +1407,32 @@ table th {
 .bank-card__grid dd { margin: 0.1rem 0 0; font-size: 0.95rem; font-weight: 600; color: #0f172a; word-break: break-word; }
 .bank-card__wide { grid-column: 1 / -1; }
 .bank-card__mono { font-family: Consolas, 'Courier New', monospace; letter-spacing: 0.04em; user-select: all; }
+
+/* Copiar datos bancarios (estilo Cashea): boton junto a cada dato y toast de confirmacion */
+.bank-card__grid div > dd.bank-copy-value { display: inline-block; }
+.bank-copy {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    margin-left: 0.5rem; padding: 0.15rem 0.5rem;
+    border: 1px solid #cbd5e1; border-radius: 9999px;
+    background: #ffffff; color: #475569;
+    font-size: 0.68rem; font-weight: 700; line-height: 1.2;
+    cursor: pointer; vertical-align: middle;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+.bank-copy i { font-size: 0.72rem; }
+.bank-copy:hover { background: #fef2f2; border-color: #8b0000; color: #8b0000; }
+.bank-copy:focus-visible { outline: 2px solid #8b0000; outline-offset: 1px; }
+.bank-copy--done { background: #16a34a; border-color: #16a34a; color: #ffffff; }
+.bank-copy-toast {
+    position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 1rem);
+    max-width: 90vw; padding: 0.6rem 1rem;
+    background: #111827; color: #ffffff; font-size: 0.85rem; font-weight: 600;
+    border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,.25);
+    opacity: 0; pointer-events: none; z-index: 60;
+    transition: opacity .2s ease, transform .2s ease;
+    word-break: break-all;
+}
+.bank-copy-toast--show { opacity: 1; transform: translate(-50%, 0); }
 .bank-card__method { margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px dashed #cbd5e1; }
 .bank-card__method-title { margin: 0 0 0.45rem; font-size: 0.82rem; font-weight: 700; color: #8b0000; text-transform: uppercase; letter-spacing: 0.03em; }
 .bank-form__group { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.9rem 1rem 1rem; }
