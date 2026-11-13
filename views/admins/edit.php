@@ -159,6 +159,14 @@
                 </div>
             </div>
 
+            <!-- Confirmar con la clave de operaciones: editar cualquier cuenta la exige -->
+            <div class="border border-red-200 bg-red-50 rounded-lg p-4">
+                <label for="edit_operation_key" class="block text-sm font-semibold text-gray-900 mb-1"><i class="fas fa-shield-alt text-red-700 mr-2"></i>Clave de Operaciones Especiales *</label>
+                <p class="text-xs text-gray-600 mb-2">Guardar cambios en esta cuenta requiere tu clave de 4 d&iacute;gitos de administrador en sesi&oacute;n (no la nueva clave del formulario).</p>
+                <input type="password" id="edit_operation_key" name="edit_operation_key" required maxlength="4" pattern="\d{4}" inputmode="numeric" placeholder="&bull;&bull;&bull;&bull;"
+                       class="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 tracking-widest text-center text-xl">
+            </div>
+
             <!-- Botones -->
             <div class="flex gap-4 pt-6 border-t border-gray-200">
                 <button type="submit" class="flex-1 btn-primary text-white font-medium py-3 px-4 rounded-lg transition-colors">

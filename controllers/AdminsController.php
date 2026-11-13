@@ -167,7 +167,12 @@ class AdminsController extends Controller {
                 'updated_at' => date('Y-m-d H:i:s')
             ];
             
-            $errors = $this->validateAdminData($data, $id);
+            // Editar cualquier cuenta exige la CLAVE DE OPERACIONES ESPECIALES del administrador en sesion.
+            $errors = [];
+            if (!(new Admin())->verifyOperationKey($_SESSION['admin_id'], trim($_POST['edit_operation_key'] ?? ''))) {
+                $errors[] = 'La clave de operaciones especiales es incorrecta o falta.';
+            }
+            $errors = array_merge($errors, $this->validateAdminData($data, $id));
 
             // Valida y hashea la nueva contraseña si se proporcionó
             if (!empty($_POST['password'])) {
@@ -226,6 +231,16 @@ class AdminsController extends Controller {
      */
     public function delete() {
         $this->requireRole(['administrador']);
+
+        // Eliminacion de cuentas DESHABILITADA (ver ALLOW_DELETE_ADMINS en config/config.php):
+        // ninguna cuenta, de ningun rol, se borra del sistema.
+        if (!ALLOW_DELETE_ADMINS) {
+            $this->jsonResponse([
+                'success' => false,
+                'message' => 'La eliminaci&oacute;n de cuentas est&aacute; deshabilitada.'
+            ], 403);
+            return;
+        }
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)$_POST['id'];

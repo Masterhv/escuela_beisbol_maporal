@@ -109,7 +109,9 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <?php if ($admin['id'] != $_SESSION['admin_id']): ?>
-                                <button onclick="deleteAdmin(<?php echo $admin['id']; ?>)" class="text-red-600 hover:text-red-800 p-1" title="Eliminar">
+                                <button type="button" disabled aria-disabled="true"
+                                        class="btn-disabled text-gray-400 p-1"
+                                        title="Eliminar deshabilitado: las cuentas no se borran del sistema">
                                     <i class="fas fa-trash"></i>
                                 </button>
                                 <?php endif; ?>

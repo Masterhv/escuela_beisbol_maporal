@@ -93,6 +93,13 @@ define('ALLOW_DELETE_ATHLETES', false);
  */
 define('ALLOW_DELETE_PAYMENTS', false);
 
+/**
+ * @var bool Permite eliminar cuentas de usuario (cualquier rol) desde Administradores.
+ * Esta deshabilitado: ninguna cuenta se borra del sistema.
+ * Para reactivar la eliminacion, cambiar a true.
+ */
+define('ALLOW_DELETE_ADMINS', false);
+
 // --- Configuración de Sesión ---
 
 // Aumenta la seguridad de las cookies de sesión.
