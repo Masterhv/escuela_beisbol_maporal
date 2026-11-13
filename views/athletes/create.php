@@ -28,7 +28,7 @@
 
         <?php if (isset($error)): ?>
             <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
-                <p class="text-red-600 text-sm"><?php echo htmlspecialchars($error); ?></p>
+                <p class="text-red-600 text-sm"><?php echo nl2br(htmlspecialchars($error)); ?></p>
             </div>
         <?php endif; ?>
 

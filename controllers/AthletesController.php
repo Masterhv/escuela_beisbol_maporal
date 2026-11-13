@@ -234,7 +234,7 @@ class AthletesController extends Controller {
             if (!empty($errors)) {
                 $this->view->render('athletes/create', [
                     'title' => 'Nuevo Atleta',
-                    'error' => implode('<br>', $errors),
+                    'error' => implode("\n", $errors),
                     'Athlete' => $data
                 ]);
                 return;
@@ -375,7 +375,7 @@ class AthletesController extends Controller {
                 $athleteData = array_merge($Athlete, $data);
                 $this->view->render('athletes/edit', [
                     'title' => 'Editar Atleta',
-                    'error' => implode('<br>', $errors),
+                    'error' => implode("\n", $errors),
                     'Athlete' => $athleteData
                 ]);
                 return;
@@ -992,20 +992,6 @@ class AthletesController extends Controller {
         if (!empty($data['id_card']) && $this->model->isAthleteIdCardTaken($data['id_card'], $excludeId)) {
             $errors[] = 'La cédula del atleta ya está registrada en el sistema.';
         }
-        if (!empty($data['parent_id_card']) && $this->model->isParentIdCardTaken($data['parent_id_card'], $excludeId)) {
-            $errors[] = 'La cédula del representante ya está registrada en el sistema.';
-        }
-
-        // Validación de email duplicado
-        if (!empty($data['parent_email']) && $this->model->isParentEmailTaken($data['parent_email'], $excludeId)) {
-            $errors[] = 'El correo electrónico del representante ya está registrado en el sistema.';
-        }
-
-        // Validación de teléfono duplicado
-        if (!empty($data['parent_phone']) && $this->model->isParentPhoneTaken($data['parent_phone'], $excludeId)) {
-            $errors[] = 'El número de teléfono del representante ya está registrado en el sistema.';
-        }
-
          // Validación de teléfono (formato: 0414-1234567)
         if (!empty($data['parent_phone']) && !preg_match('/^04(12|14|16|24|26|22)-[0-9]{7}$/', $data['parent_phone'])) {
             $errors[] = 'El teléfono del padre/madre debe tener un formato válido (ej: 0414-1234567).';
