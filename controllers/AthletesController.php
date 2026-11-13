@@ -221,7 +221,7 @@ class AthletesController extends Controller {
      * Requiere rol de 'administrador' o 'secretario'.
      */
     public function create() {
-        $this->requireRole(['administrador']); // Solo administrador puede inscribir/editar atletas
+        $this->requireRole(['administrador', 'secretario']); // Secretario puede inscribir; editar solo administrador
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $_POST;
