@@ -177,9 +177,14 @@ class AthletesController extends Controller {
         $viewerRole = $_SESSION['admin_role'];
         $athletes = array_map(fn($a) => Athlete::stripStatusDetailFor($a, $viewerRole), $athletes);
 
-        // Estadísticas globales de atletas (sin importar filtros de la tabla)
-        $athleteStats = $this->model->getAthleteStats();
-        $totalAthletes = isset($athleteStats['total']) ? (int)$athleteStats['total'] : 0;
+        // Estadísticas de atletas según el alcance del rol: el representante cuenta SOLO los suyos,
+        // igual que la lista; el resto del personal ve el total de la escuela.
+        if ($scope !== null) {
+            $totalAthletes = count($scope);
+        } else {
+            $athleteStats = $this->model->getAthleteStats();
+            $totalAthletes = isset($athleteStats['total']) ? (int)$athleteStats['total'] : 0;
+        }
 
         // Conteo de atletas por categoría (usando solo el filtro de categoría)
         $categoryCount = null;
