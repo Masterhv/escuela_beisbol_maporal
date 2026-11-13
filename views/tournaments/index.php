@@ -153,7 +153,7 @@ $statusColors = [
                        class="text-xs text-red-700 hover:text-red-900 font-medium flex items-center gap-1">
                         <i class="fas fa-eye"></i> Ver
                     </a>
-                    <?php if (in_array($_SESSION['admin_role'], ['administrador', 'secretario'])): ?>
+<?php if (in_array($_SESSION['admin_role'], ['administrador', 'secretario', 'entrenador'])): ?>
                     <a href="<?php echo BASE_URL; ?>tournaments/edit?id=<?php echo $t['id']; ?>"
                        class="text-xs text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1">
                         <i class="fas fa-edit"></i> Editar

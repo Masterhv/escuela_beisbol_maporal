@@ -42,7 +42,7 @@ class TournamentsController extends Controller {
     /*  CREATE                                                              */
     /* ------------------------------------------------------------------ */
     public function create() {
-        $this->requireRole(['administrador', 'secretario']);
+        $this->requireRole(['administrador', 'secretario', 'entrenador']); // El entrenador tambien crea torneos
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $this->collectPost();
