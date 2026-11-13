@@ -190,11 +190,10 @@
                                             <i class="fas fa-paper-plane"></i>
                                         </a>
                                     <?php endif; ?>
-                                    <?php if (in_array('approve', $rowActions, true)): ?>
-                                        <a href="<?php echo BASE_URL; ?>payments/view?id=<?php echo $payment['id']; ?>" class="text-green-700 hover:text-green-800 p-1" title="Conciliar">
-                                            <i class="fas fa-clipboard-check"></i>
-                                        </a>
-                                    <?php endif; ?>
+                                    <?php
+                                    // Conciliar solo desde la vista de detalle (payments/view), donde se ve la
+                                    // referencia y el comprobante: el listado no ofrece el icono a ningun rol.
+                                    ?>
                                     <?php if ($_SESSION['admin_role'] === 'administrador' && in_array($payment['status'], ['pending', 'rejected'], true)): ?>
                                         <a href="<?php echo BASE_URL; ?>payments/edit?id=<?php echo $payment['id']; ?>" class="text-red-600 hover:text-red-800 p-1" title="Editar cobro">
                                             <i class="fas fa-edit"></i>
