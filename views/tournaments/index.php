@@ -23,8 +23,8 @@ $statusColors = [
             </h2>
             <p class="text-gray-600 mt-1">Gestiona los torneos y competencias de la escuela</p>
         </div>
-        <?php if (in_array($_SESSION['admin_role'], ['administrador', 'secretario'])): ?>
-        <a href="<?php echo BASE_URL; ?>tournaments/create"
+<?php if (in_array($_SESSION['admin_role'], ['administrador', 'secretario', 'entrenador'])): ?>
+                    <a href="<?php echo BASE_URL; ?>tournaments/create"
            class="btn-primary text-white font-medium py-2 px-4 rounded-lg flex items-center gap-2">
             <i class="fas fa-plus"></i> Nuevo Torneo
         </a>
