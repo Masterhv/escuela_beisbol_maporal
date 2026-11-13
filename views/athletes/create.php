@@ -250,6 +250,81 @@
                 </div>
             </div>
 
+            <!-- Cuenta de acceso del representante: obligatoria, se crea aqui con los datos ya escritos -->
+            <div class="border-b border-gray-200 pb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-1">Cuenta de acceso del representante <span class="text-red-600">*</span></h3>
+                <p class="text-sm text-gray-600 mb-4">La cuenta se crea <strong>siempre</strong> en este mismo paso, usando el nombre, c&eacute;dula, tel&eacute;fono, correo, direcci&oacute;n y contacto de emergencia ya escritos. Si el representante ya tiene cuenta (otro atleta inscrito antes), se reutiliza y solo falta completar lo que falte.</p>
+                <div id="account-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento del Representante *</label>
+                        <input
+                            type="date"
+                            name="account_birth_date"
+                            id="account_birth_date"
+                            required
+                            value="<?php echo htmlspecialchars($Athlete['account_birth_date'] ?? ''); ?>"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">Debe ser mayor de 18 a&ntilde;os.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario *</label>
+                        <div class="flex gap-2">
+                            <input
+                                type="text"
+                                name="account_username"
+                                id="account_username"
+                                required
+                                maxlength="30"
+                                pattern="[A-Za-z0-9._-]{3,30}"
+                                value="<?php echo htmlspecialchars($Athlete['account_username'] ?? ''); ?>"
+                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                            >
+                            <button type="button" id="suggest_username" class="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Sugerir</button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Letras, n&uacute;meros, punto, guion y guion bajo. 3 a 30 caracteres. La sugerencia arma: apellido + inicial del nombre + &uacute;ltimos 3 d&iacute;gitos de la c&eacute;dula.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contrase&ntilde;a *</label>
+                        <input
+                            type="password"
+                            name="account_password"
+                            id="account_password"
+                            required
+                            minlength="8"
+                            value="<?php echo htmlspecialchars($Athlete['account_password'] ?? ''); ?>"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">M&iacute;nimo 8 caracteres, con may&uacute;scula, min&uacute;scula, n&uacute;mero y s&iacute;mbolo (!@#$%^&amp;*).</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contrase&ntilde;a *</label>
+                        <input
+                            type="password"
+                            name="account_password_confirm"
+                            id="account_password_confirm"
+                            required
+                            minlength="8"
+                            value="<?php echo htmlspecialchars($Athlete['account_password_confirm'] ?? ''); ?>"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                        >
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Parentesco del Contacto de Emergencia *</label>
+                        <input
+                            type="text"
+                            name="account_emergency_relationship"
+                            id="account_emergency_relationship"
+                            required
+                            maxlength="100"
+                            placeholder="Ej: madre, esposo(a), abuelo(a), t&iacute;o(a)"
+                            value="<?php echo htmlspecialchars($Athlete['account_emergency_relationship'] ?? ''); ?>"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">El contacto de emergencia que escribiste arriba se guarda tambi&eacute;n en la cuenta.</p>
+                    </div>
+                </div>
+            </div>
             <!-- Información de Contacto -->
             <div class="border-b border-gray-200 pb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Información de Contacto</h3>
@@ -605,5 +680,75 @@ document.addEventListener('DOMContentLoaded', function() {
     select.addEventListener('change', sync);
     area.addEventListener('input', function () { if (count) count.textContent = area.value.length + ' / 500'; });
     sync();
+})();
+</script>
+<script>
+// Cuenta del representante (obligatoria): el boton "Sugerir" arma usuario
+// apellido + inicial del nombre + ultimos 3 digitos de la cedula.
+// Si la cedula del representante ya tiene cuenta (hermano inscrito antes), los campos de
+// usuario/contrasena se ocultan y se desactivan: la cuenta se REUTILIZA y no se crea otra.
+(function () {
+    const BASE_URL_JS = '<?php echo BASE_URL; ?>';
+    const idCardInput = document.getElementById('parent_id_card');
+    const fields = document.getElementById('account-fields');
+    const ids = ['account_birth_date', 'account_username', 'account_password', 'account_password_confirm', 'account_emergency_relationship'];
+    const newOnly = ['account_birth_date', 'account_username', 'account_password', 'account_password_confirm', 'account_emergency_relationship'];
+    const hintId = 'account-existing-hint';
+    let lastChecked = null;
+
+    function setExisting(isExisting) {
+        if (!fields) return;
+        fields.classList.toggle('hidden', isExisting);
+        newOnly.forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = isExisting;
+                el.required = !isExisting;
+            }
+        });
+        let hint = document.getElementById(hintId);
+        if (isExisting && !hint && fields.parentNode) {
+            hint = document.createElement('p');
+            hint.id = hintId;
+            hint.className = 'text-sm text-green-700 mt-2';
+            hint.textContent = 'Este representante ya tiene cuenta de acceso: se reutilizará y no se creará otra. Solo complete los datos del atleta.';
+            fields.parentNode.insertBefore(hint, fields.nextSibling);
+        } else if (!isExisting && hint) {
+            hint.remove();
+        }
+    }
+
+    if (idCardInput && fields) {
+        idCardInput.addEventListener('change', function () {
+            const digits = (idCardInput.value || '').replace(/\D/g, '');
+            if (digits.length < 7) { lastChecked = null; setExisting(false); return; }
+            if (lastChecked === digits) return;
+            lastChecked = digits;
+            fetch(BASE_URL_JS + 'athletes/checkRepresentativeAccount?id_card=' + encodeURIComponent(digits))
+                .then(function (r) { return r.json(); })
+                .then(function (data) { setExisting(!!data.exists); })
+                .catch(function () { setExisting(false); });
+        });
+    }
+
+    const btn = document.getElementById('suggest_username');
+    if (btn) {
+        // Sugerencia: primer apellido + inicial del nombre + ultimos 3 digitos de la cedula.
+        // Ej. "Edita Rattia de Escobar" (31654321) -> rattiae321.
+        btn.addEventListener('click', function () {
+            const name = (document.getElementById('parent_name') || {}).value || '';
+            const idCard = (document.getElementById('parent_id_card') || {}).value || '';
+            const parts = name.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
+            const first = parts.length ? parts[0] : '';
+            const surname = parts.length > 1 ? parts[1] : first;
+            let user = surname + (first ? first.charAt(0) : '');
+            const digits = idCard.replace(/\D/g, '');
+            if (digits.length >= 3) { user += digits.slice(-3); }
+            const input = document.getElementById('account_username');
+            if (user && input) { input.value = user.slice(0, 30); }
+        });
+    }
 })();
 </script>

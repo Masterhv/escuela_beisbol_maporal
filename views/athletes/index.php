@@ -32,6 +32,11 @@
                 No se generó: <?php echo htmlspecialchars($_GET['plan_missing']); ?> (concepto inactivo o inexistente).
             <?php endif; ?>
         <?php endif; ?>
+        <?php if (($_GET['account'] ?? '') === 'created'): ?>
+            La cuenta de acceso del representante fue creada con el usuario indicado en el formulario.
+        <?php elseif (($_GET['account'] ?? '') === 'exists'): ?>
+            El representante ya tenía cuenta de acceso: se reutilizó, no se creó otra.
+        <?php endif; ?>
     </p></div>
     <?php if (!empty($_GET['plan_error'])): ?>
     <div class="pay-notice pay-notice--rejected"><p class="pay-notice__text">No se pudieron generar los cobros automáticos. Genéralos desde Pagos &gt; Generar cobro.</p></div>

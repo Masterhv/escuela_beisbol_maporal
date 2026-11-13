@@ -78,9 +78,21 @@ class AdminsController extends Controller {
                 'status' => $_POST['status'],
                 'password' => $_POST['password']
             ];
-            
+
+            // Las cuentas de representante ya no se crean aqui: se crean al inscribir un atleta,
+            // que reutiliza los datos del formulario de inscripcion. Se rechaza con mensaje claro
+            // (aunque el formulario ya no ofrece la opcion, el POST podria venir manipulado).
+            if ($data['role'] === 'representante') {
+                $this->view->render('admins/create', [
+                    'error' => 'Las cuentas de representante se crean desde la inscripción de un atleta: use Atletas → Nuevo Atleta y marque "Crear cuenta de acceso".',
+                    'data' => $data,
+                    'title' => 'Gestión de Administradores'
+                ]);
+                return;
+            }
+
             $errors = $this->validateAdminData($data);
-            $passwordErrors = $this->validatePasswordStrength($data['password']);
+            $passwordErrors = self::validatePasswordStrength($data['password']);
             $errors = array_merge($errors, $passwordErrors);
 
             // Validar clave de operaciones si el rol es administrador
@@ -159,7 +171,7 @@ class AdminsController extends Controller {
 
             // Valida y hashea la nueva contraseña si se proporcionó
             if (!empty($_POST['password'])) {
-                $passwordErrors = $this->validatePasswordStrength($_POST['password']);
+                $passwordErrors = self::validatePasswordStrength($_POST['password']);
                 if (!empty($passwordErrors)) {
                     $errors = array_merge($errors, $passwordErrors);
                 } else {
@@ -381,12 +393,13 @@ class AdminsController extends Controller {
     }
 
     /**
-     * Valida la fortaleza de una contraseña.
+     * Valida la fortaleza de una contraseÃ±a. Estatico y publico: el alta de la cuenta del representante
+     * desde la inscripcion del atleta (AthletesController) aplica exactamente las mismas reglas.
      *
-     * @param string $password La contraseña a validar.
+     * @param string $password La contraseÃ±a a validar.
      * @return array Un array de mensajes de error.
      */
-    private function validatePasswordStrength($password) {
+    public static function validatePasswordStrength($password) {
         $errors = [];
         if (strlen($password) < 8) {
             $errors[] = "La contraseña debe tener al menos 8 caracteres.";

@@ -3,7 +3,9 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once 'vendor/autoload.php';
+if (is_file('vendor/autoload.php')) {
+    require_once 'vendor/autoload.php';
+}
 
 /**
  * Clase Mailer para manejar el envío de correos electrónicos.
@@ -27,6 +29,15 @@ class Mailer {
      * Carga la configuración y configura la instancia de PHPMailer.
      */
     public function __construct() {
+        // Un require fallido es un error fatal que ningun try/catch atrapa: dejaria en blanco la pagina que intento
+        // enviar el correo (p. ej. el reporte de un pago, ya guardado). Se convierte en excepcion para que quien
+        // llama la capture, registre el fallo y siga.
+        if (!is_file('config/mail.php')) {
+            throw new \RuntimeException('Falta config/mail.php: no se puede enviar correo.');
+        }
+        if (!class_exists(PHPMailer::class)) {
+            throw new \RuntimeException('Falta vendor/ (PHPMailer): ejecute composer install.');
+        }
         $this->config = require 'config/mail.php';
         
         $this->mailer = new PHPMailer(true);

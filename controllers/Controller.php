@@ -150,7 +150,7 @@ class Controller {
             return $cache[$adminId];
         }
 
-        $db = (new Database())->getConnection();
+        $db = Database::getInstance()->getConnection();
         $stmt = $db->prepare(
             "SELECT s.id
              FROM athletes s

@@ -1,5 +1,6 @@
 <?php
 require_once 'controllers/Controller.php';
+require_once 'models/Admin.php';
 require_once 'vendor/autoload.php'; // Carga Dompdf
 require_once 'services/PdfGenerator.php';
 require_once 'services/AthleteEnrollmentService.php';
@@ -34,6 +35,92 @@ class AthletesController extends Controller {
         $status = is_string($status) ? trim($status) : '';
         return in_array($status, self::VALID_STATUSES, true) ? $status : $fallback;
     }
+
+    /**
+     * Prepara (y valida) la cuenta de representante que se crea junto con el atleta, reutilizando los
+     * datos que el formulario ya pide (nombre, cedula, telefono, correo, direccion y contacto de
+     * emergencia del atleta). Solo se piden aparte: fecha de nacimiento, usuario, contrasena y el
+     * parentesco del contacto de emergencia.
+     *
+     * Si la cedula del representante ya tiene cuenta en el sistema, NO se valida ni se crea nada:
+     * se devuelve accountExists para que el acceso quede vinculado por cedula, como siempre.
+     *
+     * @return array [errores[], datosParaCreateAdmin|null, yaTeniaCuenta(bool)]
+     */
+    private function prepareRepresentativeAccount(array $data, Admin $adminModel) {
+        $parentIdCard = trim($data['parent_id_card'] ?? '');
+
+        // El representante ya tiene cuenta (p. ej. otro atleta inscrito antes): no se valida ni se crea nada.
+        // Se consulta SIEMPRE en la base de datos (el flag del navegador solo mejora la UX, no se confia).
+        if ($adminModel->isIdCardTaken($parentIdCard)) {
+            return [[], null, true];
+        }
+
+        $errors = [];
+        $birthDate = trim($data['account_birth_date'] ?? '');
+        $username = trim($data['account_username'] ?? '');
+        $password = (string)($data['account_password'] ?? '');
+        $confirm = (string)($data['account_password_confirm'] ?? '');
+        $relationship = trim($data['account_emergency_relationship'] ?? '');
+
+        if ($birthDate === '') {
+            $errors[] = 'La fecha de nacimiento del representante es obligatoria para crear su cuenta.';
+        } else {
+            try {
+                $age = (new DateTime($birthDate))->diff(new DateTime('today'))->y;
+                if ($age < 18) {
+                    $errors[] = 'El representante debe ser mayor de 18 anos para tener una cuenta.';
+                }
+            } catch (Exception $e) {
+                $errors[] = 'El formato de la fecha de nacimiento del representante no es valido.';
+            }
+        }
+
+        if ($username === '') {
+            $errors[] = 'El nombre de usuario del representante es obligatorio.';
+        } elseif (!preg_match('/^[A-Za-z0-9._-]{3,30}$/', $username)) {
+            $errors[] = 'El nombre de usuario solo puede tener letras, numeros, punto, guion y guion bajo (3 a 30 caracteres).';
+        } elseif ($adminModel->isUsernameTaken($username)) {
+            $errors[] = 'El nombre de usuario ya esta registrado en el sistema.';
+        }
+
+        $email = trim($data['parent_email'] ?? '');
+        if ($email !== '' && $adminModel->isEmailTaken($email)) {
+            $errors[] = 'El correo electronico ya esta registrado con otra cuenta del sistema.';
+        }
+
+        if ($password !== $confirm) {
+            $errors[] = 'Las contrasenas no coinciden.';
+        } else {
+            $errors = array_merge($errors, AdminsController::validatePasswordStrength($password));
+        }
+
+        if ($relationship === '') {
+            $errors[] = 'Indica el parentesco del contacto de emergencia (se guarda en la cuenta).';
+        }
+
+        if (!empty($errors)) {
+            return [$errors, null, false];
+        }
+
+        $accountData = [
+            'full_name' => trim($data['parent_name'] ?? ''),
+            'id_card' => $parentIdCard,
+            'birth_date' => $birthDate,
+            'phone' => trim($data['parent_phone'] ?? ''),
+            'email' => $email,
+            'address' => trim($data['address'] ?? ''),
+            'emergency_contact_name' => trim($data['emergency_contact'] ?? ''),
+            'emergency_contact_relationship' => $relationship,
+            'emergency_contact_phone' => trim($data['emergency_phone'] ?? ''),
+            'role' => 'representante',
+            'status' => 'active',
+            'username' => $username,
+            'password' => password_hash($password, PASSWORD_DEFAULT),
+        ];
+        return [[], $accountData, false];
+    }
+
     
     /** Datos de quien actua, en el formato que espera Athlete::changeStatus(). */
     private function statusActor() {
@@ -142,6 +229,13 @@ class AthletesController extends Controller {
             // Un atleta que nace inactivo/suspendido tambien necesita su motivo.
             if ($reasonError = $this->statusReasonError($data, null)) { $errors[] = $reasonError; }
 
+            // Cuenta del representante (OBLIGATORIA): se valida ANTES de crear nada, para que un
+            // usuario/correo repetido no deje un atleta sin cuenta ni una cuenta sin atleta.
+            // Si la cedula ya tiene cuenta, prepareRepresentativeAccount la reutiliza (sin crear otra).
+            $adminModel = new Admin();
+            [$accountErrors, $accountData, $accountExists] = $this->prepareRepresentativeAccount($data, $adminModel);
+            $errors = array_merge($errors, $accountErrors);
+
             if (!empty($errors)) {
                 $this->view->render('athletes/create', [
                     'title' => 'Nuevo Atleta',
@@ -191,38 +285,64 @@ class AthletesController extends Controller {
                 'photo' => $photoPath
             ];
             
-            $result = $this->model->createAthlete($athleteData);
+            // Atleta + cuenta del representante + estatus inicial, TODO en una transaccion compartida
+            // (Database es singleton): o se registran los dos, o no queda ninguno.
+            $result = ['success' => false, 'id' => null];
+            $accountCreated = false;
+            $db = $this->model->getDb();
+            $ownTx = !$db->inTransaction();
+            try {
+                if ($ownTx) { $db->beginTransaction(); }
 
-            // Si nace inactivo/suspendido, queda registrado el detalle (motivo, quien y cuando).
-            if ($result['success'] && $athleteData['status'] !== 'active') {
-                $this->model->recordInitialStatus($result['id'], $athleteData['status'], $data['status_reason'] ?? '', $this->statusActor());
-            }
-
-            if ($result['success']) {
-                // Plan de cobros (inscripcion + mensualidades con los montos de Conceptos). Igual que la planilla,
-                // un fallo aqui nunca revierte el registro del atleta: se informa y los cobros se generan a mano.
-                $planQuery = '';
-                if (!empty($data['generate_plan']) && $result['id']) {
-                    $plan = (new PaymentWorkflow())->createEnrollmentPlan($result['id'], (int)($data['plan_months'] ?? 0), $this->statusActor());
-                    $planQuery = $plan['ok'] ? '&plan=' . $plan['created'] . (empty($plan['missing']) ? '' : '&plan_missing=' . urlencode(implode(',', $plan['missing'])))
-                                             : '&plan_error=1';
+                $result = $this->model->createAthlete($athleteData);
+                if (!$result['success'] || !$result['id']) {
+                    throw new RuntimeException($result['message'] ?? 'Error al crear el atleta.');
                 }
 
-                // EnvÃ­a la planilla de inscripciÃ³n al representante por correo y WhatsApp.
-                // Un fallo en cualquier canal nunca revierte el registro del atleta.
-                $this->sendEnrollmentSafely($result['id']);
-                $this->redirect('athletes?success=created' . $planQuery);
-            } else {
-                // Si falla la creación, eliminar la foto subida
+                if ($accountData !== null) {
+                    if (!$adminModel->createAdmin($accountData)) {
+                        throw new RuntimeException('No se pudo crear la cuenta del representante.');
+                    }
+                    $accountCreated = true;
+                }
+
+                // Si nace inactivo/suspendido, queda registrado el detalle (motivo, quien y cuando).
+                if ($athleteData['status'] !== 'active') {
+                    $st = $this->model->recordInitialStatus($result['id'], $athleteData['status'], $data['status_reason'] ?? '', $this->statusActor());
+                    if (!$st['ok']) { throw new RuntimeException('Motivo del estatus invalido.'); }
+                }
+
+                if ($ownTx) { $db->commit(); }
+            } catch (\Throwable $e) {
+                if ($ownTx && $db->inTransaction()) { $db->rollBack(); }
+                error_log('[AthletesController::create] ' . $e->getMessage());
+                // Si falla la creacion, eliminar la foto subida
                 if (!empty($photoPath) && file_exists($photoPath)) {
                     unlink($photoPath);
                 }
                 $this->view->render('athletes/create', [
                     'title' => 'Nuevo Atleta',
-                    'error' => $result['message'] ?? 'Error al crear el atleta.',
-                    'Athlete' => $data
+                    'error' => 'No se pudo completar la inscripción: ' . $e->getMessage(),
+                    'Athlete' => $data,
+                    'planConcepts' => (new PaymentWorkflow())->planConcepts(),
                 ]);
+                return;
             }
+
+            // Plan de cobros (inscripcion + mensualidades con los montos de Conceptos). Igual que la planilla,
+            // un fallo aqui nunca revierte el registro del atleta: se informa y los cobros se generan a mano.
+            $planQuery = '';
+            if (!empty($data['generate_plan'])) {
+                $plan = (new PaymentWorkflow())->createEnrollmentPlan($result['id'], (int)($data['plan_months'] ?? 0), $this->statusActor());
+                $planQuery = $plan['ok'] ? '&plan=' . $plan['created'] . (empty($plan['missing']) ? '' : '&plan_missing=' . urlencode(implode(',', $plan['missing'])))
+                                         : '&plan_error=1';
+            }
+
+            // Envia la planilla de inscripcion al representante por correo y WhatsApp.
+            // Un fallo en cualquier canal nunca revierte el registro del atleta.
+            $this->sendEnrollmentSafely($result['id']);
+            $accountQuery = $accountData !== null ? ($accountCreated ? '&account=created' : '&account=exists') : '';
+            $this->redirect('athletes?success=created' . $planQuery . $accountQuery);
         } else {
             $this->view->render('athletes/create', [
                 'title' => 'Nuevo Atleta',
@@ -929,14 +1049,14 @@ class AthletesController extends Controller {
      */
     public function autocomplete() {
         header('Content-Type: application/json');
-        
+
         if (!isset($_SESSION['admin_id'])) {
             echo json_encode([]);
             exit;
         }
-        
+
         $term = isset($_GET['term']) ? trim($_GET['term']) : '';
-        
+
         if (empty($term)) {
             echo json_encode([]);
             exit;
@@ -944,6 +1064,29 @@ class AthletesController extends Controller {
 
         $athletes = $this->model->searchByIdCard($term, $this->scopeAthleteIds());
         echo json_encode($athletes);
+        exit;
+    }
+
+    /**
+     * Consulta AJAX del formulario de inscripcion: devuelve true si la cedula del representante
+     * ya tiene cuenta de acceso. Con esto el formulario oculta los campos de usuario/contrasena
+     * (cuenta reutilizada, flujo de hermanos) y solo los exige para un representante nuevo.
+     */
+    public function checkRepresentativeAccount() {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['admin_id'])) {
+            echo json_encode(['exists' => false]);
+            exit;
+        }
+
+        $idCard = trim($_GET['id_card'] ?? '');
+        if (!preg_match('/^[0-9]{7,8}$/', $idCard)) {
+            echo json_encode(['exists' => false]);
+            exit;
+        }
+
+        echo json_encode(['exists' => (new Admin())->isIdCardTaken($idCard)]);
         exit;
     }
 

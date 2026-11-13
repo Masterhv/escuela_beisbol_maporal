@@ -118,7 +118,7 @@ class PaymentNotificationService {
         if (empty($roles)) {
             return [];
         }
-        $db = (new Database())->getConnection();
+        $db = Database::getInstance()->getConnection();
         $in = implode(',', array_fill(0, count($roles), '?'));
         $stmt = $db->prepare("SELECT id, email FROM admins WHERE role IN ({$in}) AND status = 'active' AND email <> ''");
         $stmt->execute(array_values($roles));

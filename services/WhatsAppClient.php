@@ -29,6 +29,10 @@ class WhatsAppClient {
     private const REQUEST_TIMEOUT = 15;
 
     public function __construct() {
+        // Excepcion capturable en lugar del error fatal de un require fallido (ver Mailer::__construct).
+        if (!is_file('config/whatsapp.php')) {
+            throw new \RuntimeException('Falta config/whatsapp.php: no se puede enviar por WhatsApp.');
+        }
         $this->config = require 'config/whatsapp.php';
         $this->baseUrl = 'https://graph.facebook.com/' . $this->config['api_version'];
     }

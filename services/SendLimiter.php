@@ -60,7 +60,7 @@ class SendLimiter {
 
         for ($attempt = 1; $attempt <= self::RETRIES; $attempt++) {
             try {
-                $db = (new Database())->getConnection();
+                $db = Database::getInstance()->getConnection();
 
                 if ($exempt || $limit === -1) {
                     // Exento o sin limite: se registra, pero no consume ni comprueba cupo.
@@ -105,7 +105,7 @@ class SendLimiter {
     public static function finish($id, $ok, $detail = '') {
         if (!$id) { return; }
         try {
-            $db = (new Database())->getConnection();
+            $db = Database::getInstance()->getConnection();
             $db->prepare("UPDATE send_log SET status = ?, detail = ? WHERE id = ?")
                ->execute([$ok ? 'sent' : 'failed', $detail !== '' ? mb_substr($detail, 0, 200) : null, (int)$id]);
         } catch (\Throwable $e) {

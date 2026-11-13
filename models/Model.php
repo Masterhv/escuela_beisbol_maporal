@@ -34,8 +34,8 @@ class Model {
 
         if (class_exists('Database')) {
             try {
-                $database = new Database();
-                $this->db = $database->getConnection();
+                // Conexion compartida (singleton): permite transacciones que cubran varios modelos.
+                $this->db = Database::getInstance()->getConnection();
             } catch (\Throwable $e) {
                 error_log('[Model] Error al conectar con la base de datos: ' . $e->getMessage());
                 $this->db = null;

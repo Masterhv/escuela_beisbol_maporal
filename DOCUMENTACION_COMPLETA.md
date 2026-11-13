@@ -1,7 +1,7 @@
 # Sistema de Gestión - Escuela de Béisbol Menor Maporal
 
 **Versión:** 1.2.0
-**Última actualización:** Junio 2026
+**Última actualización:** 2026
 **Autor:** Henry Velazquez
 
 ---
@@ -804,6 +804,17 @@ Una vez autenticado, verá:
   - Formato final: 0414-1234567
 - **Email** (\*): Correo electrónico válido
 
+**Paso 3bis: Cuenta de acceso del representante**
+
+En la misma pantalla, justo debajo, se crea la cuenta del representante **siempre, es obligatoria** (no hay casilla que activar): reutiliza nombre, cédula, teléfono, correo, dirección y contacto de emergencia ya escritos. Solo se piden 4 campos extra:
+
+- **Fecha de Nacimiento** (\*): debe ser mayor de 18 años
+- **Nombre de Usuario** (\*): 3-30 caracteres (letras, números, punto, guion y guion bajo). El botón **Sugerir** lo arma a partir del nombre y la cédula
+- **Contraseña y Confirmación** (\*): mín. 8 caracteres con mayúscula, minúscula, número y símbolo (!@#$%^&*)
+- **Parentesco del Contacto de Emergencia** (\*): el contacto de emergencia del atleta se guarda también en la cuenta
+
+Reglas: la cuenta nace **Activa** con rol **Representante** y es **obligatoria** (sin casilla que activar: los 4 campos son requeridos); si la cédula ya tiene cuenta (otro atleta inscrito antes), **se reutiliza** y no se crea otra — el formulario lo detecta al completar la cédula y oculta automáticamente los campos de usuario/contraseña, así que para inscribir un segundo atleta no se inventan credenciales; un usuario o correo repetido con otra cédula **bloquea la inscripción** con mensaje claro (nada se registra a medias: atleta y cuenta van en una sola transacción). Entregue el usuario y contraseña al representante en persona (no se envían por correo). Esta es la **única vía** para crear cuentas de representante: el formulario *Administradores → Nuevo* ya no ofrece el rol Representante.
+
 **Paso 4: Información de contacto**
 
 - **Dirección**: Dirección completa
@@ -836,7 +847,7 @@ Al final del formulario, antes de guardar, se define cómo se cobrará a este re
 
 1. Revisar todos los datos
 2. Hacer clic en **Crear Atleta**
-3. Se mostrará mensaje de confirmación con la cantidad de cobros generados
+3. Se mostrará mensaje de confirmación con la cantidad de cobros generados y el resultado de la cuenta del representante (creada o reutilizada)
 4. Se redirigirá a la Lista de Atletas
 
 ### Buscar Atletas
@@ -2240,6 +2251,17 @@ CREATE TABLE tournament_participants (
 ---
 
 ## 🆕 Versión 1.3.0 — Plan de cobros automático y robustez de registros (Noviembre 2026)
+
+### ✨ Nueva funcionalidad: Cuenta del representante desde la inscripción del atleta
+
+El formulario de inscripción crea ahora, en el mismo paso, la cuenta de acceso del representante (antes había que registrarla aparte desde *Administradores → Nuevo*, volviendo a pedir todos los datos):
+
+- **Reutiliza los datos ya escritos**: nombre, cédula, teléfono, correo, dirección y contacto de emergencia del atleta pasan a la cuenta. Solo se piden: fecha de nacimiento (mayor de 18), usuario (con botón "Sugerir" que arma **apellido + inicial del nombre + últimos 3 dígitos de la cédula**, ej. "Edita Rattia de Escobar" 31654321 → `rattiae321`), contraseña (mismas reglas de fortaleza que el módulo Administradores) y el parentesco del contacto de emergencia. **Es obligatoria**: sin casilla opcional; los 4 campos extra son requeridos y su falta bloquea la inscripción. **Flujo de hermanos**: al escribir la cédula del representante, el formulario consulta si ya tiene cuenta y, si la tiene, oculta los campos de usuario/contraseña y muestra "Este representante ya tiene cuenta de acceso: se reutilizará" — inscribe a varios atletas sin volver a crear la cuenta.
+- **Sin duplicados**: si la cédula ya tiene cuenta (p. ej. un hermano inscrito antes), se reutiliza y se informa; usuario/correo repetido con otra cédula bloquea la inscripción con mensaje claro.
+- **Todo o nada**: atleta + cuenta (+ estatus inicial) se registran en UNA transacción; si algo falla, no queda ninguno.
+- La cuenta nace Activa, rol Representante, con el acceso ligado a la cédula (ve sus atletas y sus cobros al entrar). Credenciales se entregan en persona; no viajan por correo. **Única vía de creación**: el formulario *Administradores → Nuevo* dejó de ofrecer el rol Representante (si alguien lo envía manipulando el POST, se rechaza con mensaje claro); una cuenta representante existente sigue editable desde *Administradores* (editar).
+
+**Archivos involucrados:** `controllers/AthletesController.php` (`prepareRepresentativeAccount()` + transacción), `views/athletes/create.php` (sección "Cuenta de acceso del representante" con sugerencia de usuario), `views/athletes/index.php` (aviso del resultado), `models/Admin.php`/`AdminsController::validatePasswordStrength` (reglas de contraseña ahora compartidas), `config/database.php` (conexión PDO única compartida por todos los modelos, requisito de la transacción).
 
 ### ✨ Nueva funcionalidad: Plan de cobros automático al inscribir un atleta
 

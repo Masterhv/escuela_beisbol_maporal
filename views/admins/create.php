@@ -151,8 +151,10 @@
                         <select id="role" name="role" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent">
                             <option value="secretario" <?php echo (isset($data['role']) && $data['role'] === 'secretario') ? 'selected' : ''; ?>>Secretario</option>
                             <option value="administrador" <?php echo (isset($data['role']) && $data['role'] === 'administrador') ? 'selected' : ''; ?>>Administrador</option>
-                            <option value="entrenador" <?php echo (isset($data['role']) && $data['role'] === 'entrenador') ? 'selected' : ''; ?>>Entrenador</option>
-                            <option value="representante" <?php echo (isset($data['role']) && $data['role'] === 'representante') ? 'selected' : ''; ?>>Representante</option>
+                <option value="entrenador" <?php echo (isset($data['role']) && $data['role'] === 'entrenador') ? 'selected' : ''; ?>>Entrenador</option>
+                <!-- Las cuentas de representante ya NO se crean aqui: se crean al inscribir un atleta
+                     (Atletas -> Nuevo Atleta -> Cuenta de acceso del representante), que reutiliza los
+                     datos del formulario y evita pedirlos dos veces. -->
                         </select>
                     </div>
                      <div>
