@@ -829,7 +829,7 @@ class AthletesController extends Controller {
      * POST (AJAX). Requiere rol de 'administrador' o 'secretario'.
      */
     public function resendEnrollmentEmail() {
-        $this->requireRole(['administrador']); // Solo administrador: parte del flujo de inscripcion
+        $this->requireRole(['administrador', 'secretario']); // Reenvio sin editar datos
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
@@ -855,7 +855,7 @@ class AthletesController extends Controller {
      * POST (AJAX). Requiere rol de 'administrador' o 'secretario'.
      */
     public function resendEnrollmentWhatsApp() {
-        $this->requireRole(['administrador']); // Solo administrador: parte del flujo de inscripcion
+        $this->requireRole(['administrador', 'secretario']); // Reenvio sin editar datos
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;

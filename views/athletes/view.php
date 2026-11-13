@@ -127,7 +127,7 @@
         </div>
 
         <?php
-        $canResend = $_SESSION['admin_role'] === 'administrador'; // reenvio de planilla: parte del flujo de inscripcion
+        $canResend = in_array($_SESSION['admin_role'], ['administrador', 'secretario']); // reenvio sin editar datos
         $enrollStatusLabels = ['sent' => 'Enviado', 'failed' => 'Fallido', 'not_sent' => 'No enviado'];
         $enrollStatusColors = [
             'sent' => 'bg-green-100 text-green-800',
