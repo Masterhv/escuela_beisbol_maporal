@@ -76,7 +76,7 @@
                         $role = $_SESSION['admin_role'];
                         $navAll = [
                             ['id' => 'dashboard',   'label' => 'Dashboard',        'icon' => 'fa-home'],
-                            ['id' => 'athletes',    'label' => 'Atletas',          'icon' => 'fa-users'],
+                            ['id' => 'athletes',    'label' => ($role === 'representante' ? 'Mis Atletas' : 'Atletas'), 'icon' => 'fa-users'],
                             ['id' => 'payments',    'label' => ($role === 'representante' ? 'Mis pagos' : 'Pagos'), 'icon' => 'fa-credit-card', 'roles' => ['administrador', 'secretario', 'representante']],
                             ['id' => 'review',      'label' => 'Por revisar',      'icon' => 'fa-clipboard-check', 'href' => 'payments/review', 'roles' => ['secretario', 'administrador']],
                             ['id' => 'concepts',    'label' => 'Conceptos',        'icon' => 'fa-tags',            'roles' => ['administrador']],
