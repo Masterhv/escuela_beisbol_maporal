@@ -121,7 +121,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario *</label>
-                        <input type="text" id="username" name="username" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent" value="<?php echo htmlspecialchars($data['username'] ?? ''); ?>">
+                        <div class="flex gap-2">
+                            <input type="text" id="username" name="username" required maxlength="30" pattern="[A-Za-z0-9._-]{3,30}" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent" value="<?php echo htmlspecialchars($data['username'] ?? ''); ?>">
+                            <button type="button" id="suggest-username" class="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Sugerir</button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Letras, números, punto, guion y guion bajo. La sugerencia arma: apellido + inicial del nombre + últimos 3 dígitos de la cédula.</p>
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
@@ -300,6 +304,25 @@ document.addEventListener('DOMContentLoaded', function() {
         this.querySelector('i').classList.toggle('fa-eye');
         this.querySelector('i').classList.toggle('fa-eye-slash');
     });
+
+    // --- Sugerencia de nombre de usuario: apellido + inicial del nombre + 3 digitos de la cedula ---
+    const suggestBtn = document.getElementById('suggest-username');
+    const fullNameInput = document.getElementById('full_name');
+    const idCardInput = document.getElementById('id_card');
+    if (suggestBtn && fullNameInput && idCardInput) {
+        suggestBtn.addEventListener('click', function() {
+            const parts = fullNameInput.value.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
+            const first = parts.length ? parts[0] : '';
+            const surname = parts.length > 1 ? parts[1] : first;
+            let user = surname + (first ? first.charAt(0) : '');
+            const digits = idCardInput.value.replace(/\D/g, '');
+            if (digits.length >= 3) { user += digits.slice(-3); }
+            const input = document.getElementById('username');
+            if (user && input) { input.value = user.slice(0, 30); }
+        });
+    }
 
     // --- Phone Number Combination ---
     const phoneCode = document.getElementById('phone_code');
