@@ -806,20 +806,24 @@ Una vez autenticado, verá:
 
 **Paso 3bis: Cuenta de acceso del representante**
 
-En la misma pantalla, justo debajo, se crea la cuenta del representante **siempre, es obligatoria** (no hay casilla que activar): reutiliza nombre, cédula, teléfono, correo, dirección y contacto de emergencia ya escritos. Solo se piden 4 campos extra:
+En la misma pantalla, justo después del contacto de emergencia, se crea la cuenta del representante **siempre, es obligatoria** (no hay casilla que activar): reutiliza nombre, cédula, teléfono, correo, dirección y contacto de emergencia ya escritos. Solo se piden 3 campos extra:
 
 - **Fecha de Nacimiento** (\*): debe ser mayor de 18 años
 - **Nombre de Usuario** (\*): 3-30 caracteres (letras, números, punto, guion y guion bajo). El botón **Sugerir** lo arma a partir del nombre y la cédula
 - **Contraseña y Confirmación** (\*): mín. 8 caracteres con mayúscula, minúscula, número y símbolo (!@#$%^&*)
-- **Parentesco del Contacto de Emergencia** (\*): el contacto de emergencia del atleta se guarda también en la cuenta
+
+El parentesco del contacto de emergencia se pide junto al nombre y teléfono del contacto (Paso 4) y se guarda también en la cuenta.
 
 Reglas: la cuenta nace **Activa** con rol **Representante** y es **obligatoria** (sin casilla que activar: los 4 campos son requeridos); si la cédula ya tiene cuenta (otro atleta inscrito antes), **se reutiliza** y no se crea otra — el formulario lo detecta al completar la cédula y oculta automáticamente los campos de usuario/contraseña, así que para inscribir un segundo atleta no se inventan credenciales; un usuario o correo repetido con otra cédula **bloquea la inscripción** con mensaje claro (nada se registra a medias: atleta y cuenta van en una sola transacción). Entregue el usuario y contraseña al representante en persona (no se envían por correo). Esta es la **única vía** para crear cuentas de representante: el formulario *Administradores → Nuevo* ya no ofrece el rol Representante.
 
 **Paso 4: Información de contacto**
 
-- **Dirección**: Dirección completa
-- **Contacto de Emergencia**: Nombre de persona a contactar
-- **Teléfono de Emergencia**: Teléfono de emergencia
+- **Dirección**: Dirección de la casa del atleta o del representante
+- **Contacto de Emergencia** (bloque resaltado, los tres datos juntos):
+  - **Nombre** (\*): nombre y apellido de la persona a llamar ante un accidente o urgencia durante entrenamientos y juegos
+  - **Parentesco con el atleta** (\*): su relación (madre, esposo(a), abuelo(a), tío(a)…). También queda en la cuenta del representante
+  - **Teléfono** (\*): código de área (0412, 0414, 0416, 0424, 0426, 0422) + 7 dígitos
+  - Puede ser la misma persona que el representante o alguien distinto (p. ej. un familiar cercano que viva cerca)
 
 **Paso 5: Información médica**
 

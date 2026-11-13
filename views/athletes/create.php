@@ -250,10 +250,92 @@
                 </div>
             </div>
 
+            <!-- Información de Contacto -->
+            <div class="border-b border-gray-200 pb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Información de Contacto</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
+                        <textarea
+                            name="address"
+                            rows="2"
+                            required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                        ><?php echo isset($Athlete['address']) ? htmlspecialchars($Athlete['address']) : ''; ?></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Dirección de la casa del atleta o del representante.</p>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <h4 class="text-sm font-semibold text-gray-900 mb-1">Contacto de Emergencia <span class="text-red-600">*</span></h4>
+                        <p class="text-xs text-gray-500 mb-3">Persona a llamar si el atleta sufre un accidente o urgencia <strong>durante entrenamientos y juegos</strong>. Se guarda en la ficha del atleta y también en la cuenta del representante. Puede ser la misma persona o alguien distinto (por ejemplo un familiar cercano que viva cerca).</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                                <input
+                                    type="text"
+                                    name="emergency_contact"
+                                    id="emergency_contact"
+                                    required
+                                    placeholder="Nombre y apellido"
+                                    value="<?php echo isset($Athlete['emergency_contact']) ? htmlspecialchars($Athlete['emergency_contact']) : ''; ?>"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                                >
+                                <p class="text-red-500 text-sm mt-1 hidden validation-error"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Parentesco con el atleta *</label>
+                                <input
+                                    type="text"
+                                    name="account_emergency_relationship"
+                                    id="account_emergency_relationship"
+                                    required
+                                    maxlength="100"
+                                    placeholder="Ej: madre, esposo(a), abuelo(a), tío(a)"
+                                    value="<?php echo htmlspecialchars($Athlete['account_emergency_relationship'] ?? ''); ?>"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                                >
+                                <p class="text-xs text-gray-500 mt-1">Su relación con el atleta (también queda en la cuenta del representante).</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                                <div class="flex gap-2">
+                                    <select
+                                        name="emergency_phone_code"
+                                        id="emergency_phone_code"
+                                        required
+                                        class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                                    >
+                                        <option value="0412" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0412') === 0) ? 'selected' : ''; ?>>0412</option>
+                                        <option value="0414" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0414') === 0) ? 'selected' : ''; ?>>0414</option>
+                                        <option value="0416" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0416') === 0) ? 'selected' : ''; ?>>0416</option>
+                                        <option value="0424" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0424') === 0) ? 'selected' : ''; ?>>0424</option>
+                                        <option value="0426" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0426') === 0) ? 'selected' : ''; ?>>0426</option>
+                                        <option value="0422" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0422') === 0) ? 'selected' : ''; ?>>0422</option>
+                                    </select>
+                                    <input
+                                        type="text"
+                                        name="emergency_phone_number"
+                                        id="emergency_phone_number"
+                                        required
+                                        placeholder="1234567"
+                                        maxlength="7"
+                                        pattern="[0-9]{7}"
+                                        value="<?php echo isset($Athlete['emergency_phone']) ? htmlspecialchars(substr($Athlete['emergency_phone'], -7)) : ''; ?>"
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
+                                    >
+                                    <input type="hidden" name="emergency_phone" id="emergency_phone" value="">
+                                </div>
+                                <p class="text-red-500 text-sm mt-1 hidden validation-error"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Cuenta de acceso del representante: obligatoria, se crea aqui con los datos ya escritos -->
             <div class="border-b border-gray-200 pb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-1">Cuenta de acceso del representante <span class="text-red-600">*</span></h3>
-                <p class="text-sm text-gray-600 mb-4">La cuenta se crea <strong>siempre</strong> en este mismo paso, usando el nombre, c&eacute;dula, tel&eacute;fono, correo, direcci&oacute;n y contacto de emergencia ya escritos. Si el representante ya tiene cuenta (otro atleta inscrito antes), se reutiliza y solo falta completar lo que falte.</p>
+                <p class="text-sm text-gray-600 mb-4">La cuenta se crea <strong>siempre</strong> en este mismo paso, usando el nombre, c&eacute;dula, tel&eacute;fono, correo, direcci&oacute;n y contacto de emergencia ya escritos arriba. Si el representante ya tiene cuenta (otro atleta inscrito antes), se reutiliza y no se pide nada de esto.</p>
                 <div id="account-fields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento del Representante *</label>
@@ -309,85 +391,8 @@
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
                         >
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Parentesco del Contacto de Emergencia *</label>
-                        <input
-                            type="text"
-                            name="account_emergency_relationship"
-                            id="account_emergency_relationship"
-                            required
-                            maxlength="100"
-                            placeholder="Ej: madre, esposo(a), abuelo(a), t&iacute;o(a)"
-                            value="<?php echo htmlspecialchars($Athlete['account_emergency_relationship'] ?? ''); ?>"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                        >
-                        <p class="text-xs text-gray-500 mt-1">El contacto de emergencia que escribiste arriba se guarda tambi&eacute;n en la cuenta.</p>
-                    </div>
                 </div>
             </div>
-            <!-- Información de Contacto -->
-            <div class="border-b border-gray-200 pb-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Información de Contacto</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
-                        <textarea 
-                            name="address" 
-                            rows="2" 
-                            required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                       ><?php echo isset($Athlete['address']) ? htmlspecialchars($Athlete['address']) : ''; ?></textarea>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Contacto de Emergencia *</label>
-                            <input 
-                                type="text" 
-                                name="emergency_contact"
-                                id="emergency_contact"
-                                required
-                                value="<?php echo isset($Athlete['emergency_contact']) ? htmlspecialchars($Athlete['emergency_contact']) : ''; ?>"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                           >
-                           <p class="text-red-500 text-sm mt-1 hidden validation-error"></p>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono de Emergencia *</label>
-                            <div class="flex gap-2">
-                                <select
-                                    name="emergency_phone_code"
-                                    id="emergency_phone_code"
-                                    required
-                                    class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                                >
-                                    <option value="0412" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0412') === 0) ? 'selected' : ''; ?>>0412</option>
-                                    <option value="0414" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0414') === 0) ? 'selected' : ''; ?>>0414</option>
-                                    <option value="0416" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0416') === 0) ? 'selected' : ''; ?>>0416</option>
-                                    <option value="0424" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0424') === 0) ? 'selected' : ''; ?>>0424</option>
-                                    <option value="0426" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0426') === 0) ? 'selected' : ''; ?>>0426</option>
-                                    <option value="0422" <?php echo (isset($Athlete['emergency_phone']) && strpos($Athlete['emergency_phone'], '0422') === 0) ? 'selected' : ''; ?>>0422</option>
-                                </select>
-                                <input
-                                    type="text"
-                                    name="emergency_phone_number"
-                                    id="emergency_phone_number"
-                                    required
-                                    placeholder="1234567"
-                                    maxlength="7"
-                                    pattern="[0-9]{7}"
-                                    value="<?php echo isset($Athlete['emergency_phone']) ? htmlspecialchars(substr($Athlete['emergency_phone'], -7)) : ''; ?>"
-                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                                >
-                                <input type="hidden" name="emergency_phone" id="emergency_phone" value="">
-                            </div>
-                            <p class="text-red-500 text-sm mt-1 hidden validation-error"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Información Médica -->
             <div class="pb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Información Médica</h3>
