@@ -387,7 +387,7 @@ extension=fileinfo
 - Validación automática de edad vs categoría
 - Gestión de números de jersey únicos
 - Filtros por categoría, edad, estado
-- Planilla de inscripción, ficha técnica y planilla en blanco (descargables; la planilla se envía al representante por correo y WhatsApp al inscribir)
+- Planilla de inscripción, ficha técnica y planilla en blanco (descargables **solo por el personal** — Administrador, Secretario y Entrenador; el Representante recibe la planilla por correo y WhatsApp al inscribir, no la descarga desde la vista)
 - **Solvencia de retiro**: documento que solo se emite si el atleta no tiene pagos pendientes; al emitirlo el atleta pasa a inactivo (ver "Solvencia de retiro" más abajo)
 - **Constancia de pertenencia**: documento que acredita que el atleta forma parte de la escuela; solo se emite a atletas activos, dura 30 días y se descarga o se envía por correo (ver "Constancia de pertenencia" más abajo)
 
@@ -404,7 +404,8 @@ extension=fileinfo
 
 - Generar cobros por concepto (secretario / administrador)
 - Reportar un pago con su comprobante (representante, o el personal en su nombre)
-- Conciliar: aprobar o rechazar con comentario (secretario)
+- Conciliar: aprobar o rechazar con comentario (secretario) — **desde la vista de detalle del pago**, donde se ven la referencia y el comprobante; el listado de pagos ya no ofrece el icono de conciliar a ningún rol
+- Editar un cobro creado (concepto, monto, fecha): **solo administrador**, exige clave de operaciones y solo cobros Pendientes o Rechazados
 - Reabrir un pago aprobado con motivo (administrador)
 - Catálogo de conceptos y tarifas (administrador)
 - Datos bancarios de la escuela, visibles al representante al reportar un pago (administrador los carga)
@@ -462,6 +463,7 @@ Cada PDF generado incluye automáticamente un **código QR** en la parte inferio
 2. El código QR apunta a `BASE_URL/verify?token={token}`.
 3. Al escanear el QR (o acceder a la URL), el sistema muestra los **datos originales** del momento de generación y confirma si el documento es auténtico.
 4. Si el documento fue alterado por un editor PDF externo, los datos del impreso no coincidirán con los del sistema — la discrepancia es inmediatamente visible.
+5. El PDF impreso incluye además el bloque **"Datos de Creación del Documento"** junto al QR: tipo de reporte, usuario que lo generó, fecha/hora de generación y nombre de archivo.
 
 **Estados de verificación:**
 
@@ -488,7 +490,9 @@ Cada PDF generado incluye automáticamente un **código QR** en la parte inferio
 
 **Funcionalidades:**
 
-- Crear, editar, ver y eliminar administradores
+- Crear, editar y ver administradores
+- **Editar cualquier cuenta exige la clave de operaciones especiales** del administrador en sesión
+- **La eliminación de cuentas está deshabilitada** (`ALLOW_DELETE_ADMINS = false`): ninguna cuenta, de ningún rol, se borra del sistema
 - Gestión de roles y permisos
 - Información de contacto y emergencia
 
@@ -547,6 +551,7 @@ El sistema cuenta con **cinco roles** de usuario, cada uno con permisos diferenc
 - ✅ Acceso a reportes y dashboard (sin cifras de dinero)
 - ❌ **NO ve montos, referencias bancarias ni comprobantes** de ningún pago, y **no tiene acceso al módulo de Pagos**: si intenta abrir Pagos, un pago o un recibo, vuelve al Dashboard
 - ❌ **NO puede** crear, editar ni borrar atletas, pagos ni conceptos
+- ✅ Crear **torneos** (botón Nuevo Torneo); editarlos o borrarlos sigue fuera de su alcance
 - ❌ **NO puede** emitir solvencia de retiro ni constancia
 - ❌ **NO puede** ver ni gestionar cronogramas de otros entrenadores
 
@@ -887,6 +892,8 @@ Al final del formulario, antes de guardar, se define cómo se cobrará a este re
 
 ### Editar atleta
 
+⚠️ **Solo el Administrador** edita atletas (secretario y entrenador no ven el ícono de lápiz) y el guardado exige la **clave de operaciones especiales** (recuadro rojo del formulario).
+
 1. En la lista, hacer clic en ícono de **lápiz** (editar)
 2. O desde detalles, hacer clic en **Editar**
 3. Modificar los campos necesarios
@@ -895,7 +902,7 @@ Al final del formulario, antes de guardar, se define cómo se cobrará a este re
    - Seleccionar nueva imagen
    - La foto anterior se eliminará automáticamente
 5. Si cambia el **Estatus** a Inactivo o Suspendido, aparece el campo **Motivo del cambio** y es obligatorio (ver *Detalle del estatus de un atleta*)
-6. Hacer clic en **Guardar Cambios**
+6. Hacer clic en **Actualizar Atleta**; el guardado exige la **clave de operaciones especiales** (4 dígitos)
 7. Se mostrará confirmación
 
 ### Solvencia de retiro
@@ -1048,6 +1055,8 @@ Se ve en dos sitios: en el **detalle del atleta** (bloque *Estado y retiro*, con
 Si el pago es **rechazado**, el representante recibe un correo con el motivo, lo ve en la ficha del pago y puede volver a reportarlo.
 
 ### Conciliar un pago (secretario o administrador)
+
+> 📌 La conciliación se hace **desde la vista de detalle del pago**, donde se ven la referencia y el comprobante; el icono verde de conciliar ya no aparece en el listado principal (ningún rol).
 
 > 🔔 **Aviso de pagos nuevos:** en el menú, **Por revisar** muestra un **contador rojo** con los pagos que ese usuario puede conciliar, igual para el **secretario y el administrador**. No cuenta los que él mismo registró (no podría aprobarlos); en la bandeja esos llevan el botón **Ver** y la marca "Lo registraste tú". El contador se actualiza al cargar o recargar cualquier pantalla; no hay actualización automática. **Además**, cada vez que se reporta un pago se envía un **correo a los secretarios y administradores activos** (excepto a quien lo registró, que no podría conciliarlo). El correo solo dice que hay un pago por revisar —atleta, concepto, monto y quién lo reportó—, **sin referencia bancaria ni comprobante**: esos datos se ven dentro del sistema. Los destinatarios salen de los roles que el modelo autoriza a aprobar (`PaymentWorkflow::rolesFor('approve')`): si esa regla cambia, el aviso la sigue sin tocar más código. No se envía al entrenador ni al representante. Si el envío falla, el reporte del pago **no** se revierte: el error queda en el log y el contador sigue avisando.
 
@@ -1315,19 +1324,16 @@ El sistema valida automáticamente:
 
 ### Editar Administrador
 
-⚠️ **Solo disponible para administradores**
+⚠️ **Solo disponible para administradores** y exige la **clave de operaciones especiales** del administrador en sesión (recuadro rojo del formulario; no confundir con la "Nueva Clave", que cambia la propia clave de operaciones).
 
 1. Hacer clic en ícono de **lápiz** (editar)
 2. Modificar campos necesarios
-3. Hacer clic en **Guardar Cambios**
+3. Ingresar la **clave de operaciones especiales** (4 dígitos)
+4. Hacer clic en **Actualizar Administrador**
 
-### Eliminar Secretario-Entrenador
+### Eliminar cuenta (Secretario / Entrenador / Administrador)
 
-⚠️ **Solo disponible para administradores**
-
-1. Hacer clic en ícono de **papelera** (eliminar)
-2. Confirmar eliminación
-3. El usuario se eliminará permanentemente
+🚫 **Función deshabilitada** (`ALLOW_DELETE_ADMINS = false` en `config/config.php`): ninguna cuenta, de ningún rol, se borra del sistema. El ícono de papelera queda deshabilitado en la lista y el endpoint responde 403. Para retirar el acceso de una persona, edite su cuenta y cambie su **Estado** a **Inactivo**.
 
 ---
 
@@ -1782,17 +1788,20 @@ El sistema detecta cualquier alteración realizada con editores PDF externos por
 - **HTML5** - Estructura de páginas
 - **Hoja de estilos propia (`style.css`)** - Utilidades al estilo Tailwind definidas a mano, con el tema vinotinto del proyecto (no es el Tailwind completo)
 - **Font Awesome 6.4** - Iconos (incluido en `style.css`, fuentes locales)
+- **Alpine.js 3** - Interactividad declarativa (menú, módulo de Reportes), servida **localmente** desde `views/assets/js/alpine.min.js`
 - **JavaScript Vanilla** - Interactividad y validaciones
 
 ## 🎨 Dónde vive la apariencia (CSS)
 
-Toda la apariencia está en `views/assets/css/`, sin dependencias externas ni CDN:
+Toda la apariencia está en `views/assets/css/`, sin dependencias externas ni CDN. **El sistema completo funciona sin internet**: CSS, fuentes e Alpine.js se sirven del propio servidor.
 
 ```
 views/assets/css/
 ├── style.css     ← ÚNICA hoja de estilos de la interfaz web
 ├── pdf.css       ← ÚNICA hoja de estilos de los PDF (Dompdf)
 └── webfonts/     ← fuentes de Font Awesome
+views/assets/js/
+└── alpine.min.js ← Alpine.js 3 (local; el menú y el módulo de Reportes no cargan de CDN)
 ```
 
 **Reglas del proyecto (arquitectura MVC):**
@@ -2201,7 +2210,8 @@ Se implementó un módulo completo para la gestión de torneos y competencias de
 | Acción | Administrador | Secretario | Entrenador | Representante |
 |---|:---:|:---:|:---:|:---:|
 | Ver lista y detalles | ✅ | ✅ | ✅ | ✅ |
-| Crear / Editar torneos | ✅ | ✅ | ❌ | ❌ |
+| Crear torneos (Nuevo Torneo) | ✅ | ✅ | ✅ | ❌ |
+| Editar torneos | ✅ | ✅ | ❌ | ❌ |
 | Inscribir / Retirar atletas | ✅ | ✅ | ❌ | ❌ |
 | Eliminar torneos | ✅ | ❌ | ❌ | ❌ |
 
@@ -2260,10 +2270,10 @@ CREATE TABLE tournament_participants (
 
 El formulario de inscripción crea ahora, en el mismo paso, la cuenta de acceso del representante (antes había que registrarla aparte desde *Administradores → Nuevo*, volviendo a pedir todos los datos):
 
-- **Reutiliza los datos ya escritos**: nombre, cédula, teléfono, correo, dirección y contacto de emergencia del atleta pasan a la cuenta. Solo se piden: fecha de nacimiento (mayor de 18), usuario (con botón "Sugerir" que arma **apellido + inicial del nombre + últimos 3 dígitos de la cédula**, ej. "Edita Rattia de Escobar" 31654321 → `rattiae321`), contraseña (mismas reglas de fortaleza que el módulo Administradores) y el parentesco del contacto de emergencia. **Es obligatoria**: sin casilla opcional; los 4 campos extra son requeridos y su falta bloquea la inscripción. **Flujo de hermanos**: al escribir la cédula del representante, el formulario consulta si ya tiene cuenta y, si la tiene, oculta los campos de usuario/contraseña y muestra "Este representante ya tiene cuenta de acceso: se reutilizará" — inscribe a varios atletas sin volver a crear la cuenta.
-- **Sin duplicados**: si la cédula ya tiene cuenta (p. ej. un hermano inscrito antes), se reutiliza y se informa; usuario/correo repetido con otra cédula bloquea la inscripción con mensaje claro.
+- **Reutiliza los datos ya escritos**: nombre, cédula, teléfono, correo, dirección y contacto de emergencia del atleta pasan a la cuenta. En su lugar natural se piden la **fecha de nacimiento** del representante (en *Padre/Madre*, con **edad calculada** de solo lectura y aviso de mayoría de edad, como la del atleta) y el **parentesco del contacto de emergencia** (en el bloque resaltado de *Contacto de Emergencia* del Paso 4). En la sección "Cuenta de acceso" solo quedan **usuario** (botón "Sugerir": **apellido + inicial del nombre + últimos 3 dígitos de la cédula**, ej. "Edita Rattia de Escobar" 31654321 → `rattiae321`; el mismo botón existe en *Administradores → Nuevo*) y **contraseña** (reglas del módulo, **sin campo de confirmación duplicado**). **Es obligatoria**: sin casilla opcional; su falta bloquea la inscripción. **Flujo de hermanos**: al escribir la cédula del representante el formulario consulta **en tiempo real** si ya tiene cuenta y, si la tiene, oculta los campos con una caja azul: "*Edita Rattia de Escobar ya tiene cuenta de acceso (usuario `rattiae`)*. NO se creará otra…" — el hermano se inscribe sin volver a pedir credenciales.
+- **Sin duplicados**: si la cédula ya tiene cuenta (p. ej. un hermano inscrito antes), se reutiliza y se informa; usuario/correo repetido con otra cédula bloquea la inscripción con mensaje claro. Las validaciones que exigían cédula/correo/teléfono de representante "únicos" en la tabla de atletas se retiraron: los hermanos comparten representante por diseño.
 - **Todo o nada**: atleta + cuenta (+ estatus inicial) se registran en UNA transacción; si algo falla, no queda ninguno.
-- La cuenta nace Activa, rol Representante, con el acceso ligado a la cédula (ve sus atletas y sus cobros al entrar). Credenciales se entregan en persona; no viajan por correo. **Única vía de creación**: el formulario *Administradores → Nuevo* dejó de ofrecer el rol Representante (si alguien lo envía manipulando el POST, se rechaza con mensaje claro); una cuenta representante existente sigue editable desde *Administradores* (editar).
+- La cuenta nace Activa, rol Representante, con el acceso ligado a la cédula (ve sus atletas y sus cobros al entrar, y el menú le dice "Mis Atletas"/"Mis pagos"). Credenciales se entregan en persona; no viajan por correo. **Única vía de creación**: el formulario *Administradores → Nuevo* dejó de ofrecer el rol Representante (si alguien lo envía manipulando el POST, se rechaza con mensaje claro); una cuenta representante existente sigue editable desde *Administradores* (editar; exige clave de operaciones).
 
 **Archivos involucrados:** `controllers/AthletesController.php` (`prepareRepresentativeAccount()` + transacción), `views/athletes/create.php` (sección "Cuenta de acceso del representante" con sugerencia de usuario), `views/athletes/index.php` (aviso del resultado), `models/Admin.php`/`AdminsController::validatePasswordStrength` (reglas de contraseña ahora compartidas), `config/database.php` (conexión PDO única compartida por todos los modelos, requisito de la transacción).
 
@@ -2306,7 +2316,24 @@ El nombre del reporte en el encabezado de todos los PDF (historial de pagos, pla
 
 ### 🗄️ Base de datos: esquema de referencia re-importado
 
-El esquema local quedó desfasado del flujo de pagos (causa de los síntomas del punto de solución de problemas "El cobro se crea pero sale error"): se re-importó `database/escuela_beisbol_maporal.sql` completo (19 tablas + 2 vistas, todo el flujo nuevo, `payment_history` y `send_log` con PK y auto_increment). Ver la nueva entrada de Solución de Problemas para diagnosticar y repetir este paso en otra instalación.
+El esquema local quedó desfasado del flujo de pagos (causa de los síntomas del punto de solución de problemas "El cobro se crea pero sale error"): se re-importó `database/escuela_beisbol_maporal.sql` completo (19 tablas + 2 vistas, todo el flujo nuevo, `payment_history` y `send_log` con PK y auto_increment). Ver la nueva entrada de Solución de Problemas para diagnosticar y repetir este paso en otra instalación. Queda un **único archivo de base de datos** en `database/` para evitar confusiones.
+
+### 🔐 Permisos refinados (edición y borrado por rol)
+
+- **Editar atletas: solo Administrador.** El secretario mantiene la INSCRIPCIÓN (Nuevo Atleta) y el reenvío de la planilla por correo/WhatsApp, pero no edita atletas ya creados. Los íconos de lápiz solo se ven para el administrador y el guard del servidor lo impone.
+- **Editar cobros: solo Administrador** (con clave de operaciones; solo Pendientes o Rechazados). Secretarios siguen generando cobros y conciliando.
+- **Conciliar solo desde la vista de detalle**: el icono verde de conciliar salió del listado de pagos para todos los roles (la referencia y el comprobante se ven en el detalle).
+- **Entrenador: crear torneos** (botón Nuevo Torneo visible); editarlos o eliminarlos sigue sin tocarle.
+- **Eliminar cuentas deshabilitado** (`ALLOW_DELETE_ADMINS = false`): ninguna cuenta de ningún rol se borra; el icono queda deshabilitado y el endpoint responde 403. Se retira el acceso cambiando la cuenta a Inactivo.
+- **Editar cualquier cuenta (Administradores) exige clave de operaciones** del administrador en sesión (campo `edit_operation_key`, separado de la "Nueva Clave" que cambia la propia).
+
+### 🛠️ Otros robustecimientos y mejoras
+
+- **Emails/WhatsApp más resistentes**: si falta `config/mail.php`/`config/whatsapp.php` o `vendor/` (caso típico de un clon), `Mailer` y `WhatsAppClient` lanzan una excepción capturable — el aviso se pierde pero la página no queda en blanco y el pago/registro ya guardado se conserva.
+- **Descargas solo para el personal**: el bloque "Descargas" (planilla del atleta y ficha técnica) no se muestra al representante, y `downloadEnrollmentForm` exige rol del personal en el servidor; la ficha técnica ya lo estaba. El representante recibe la planilla por correo/WhatsApp.
+- **Total de Atletas por rol**: la tarjeta usa el conteo global para el personal y, para el representante, solo SUS atletas (el mismo alcance de su lista "Mis Atletas").
+- **PDF: bloque "Datos de Creación del Documento"** junto al QR — tipo de reporte, usuario que lo generó, fecha/hora y nombre de archivo, en todos los documentos verificados.
+- **Offline listo**: el módulo de Reportes y el menú cargan **Alpine.js local** (`views/assets/js/alpine.min.js`, 3.14.9); sin internet los filtros, la vista previa y los PDF siguen funcionando (CSS y fuentes ya eran locales).
 
 ---
 
