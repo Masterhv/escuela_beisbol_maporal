@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>views/assets/css/style.css?v=<?php echo @filemtime(BASE_PATH . 'views/assets/css/style.css') ?: VERSION; ?>">
 
     <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="<?php echo BASE_URL; ?>views/assets/js/alpine.min.js?v=<?php echo @filemtime(BASE_PATH . 'views/assets/js/alpine.min.js') ?: VERSION; ?>"></script>
 </head>
 <body class="bg-gray-50">
     <?php if (isset($_SESSION['admin_id'])): ?>

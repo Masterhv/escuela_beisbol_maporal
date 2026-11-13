@@ -224,7 +224,7 @@
     <?php endif; ?>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script defer src="<?php echo defined('BASE_URL') ? BASE_URL : '/project/'; ?>views/assets/js/alpine.min.js?v=<?php echo defined('BASE_PATH') && is_file(BASE_PATH . 'views/assets/js/alpine.min.js') ? @filemtime(BASE_PATH . 'views/assets/js/alpine.min.js') : time(); ?>"></script>
 <script>
     function reports() {
         return {
