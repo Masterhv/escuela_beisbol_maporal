@@ -832,7 +832,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return strength === 5;
     }
     if (acctPwInput) { acctPwInput.addEventListener('input', validateAccountPassword); }
-    if (acctPwConfirm) { acctPwConfirm.addEventListener('input', validateAccountPassword); }
 
     const generateAcctPwBtn = document.getElementById('generate-account-password');
     if (generateAcctPwBtn) {
