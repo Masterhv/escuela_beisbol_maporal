@@ -141,6 +141,11 @@ trait PdfGenerator {
             $data['_verify_url']   = $verifyUrl;
             $data['_token']        = $token;
             $data['_fingerprint']  = substr($fingerprint, 0, 16) . '...';
+            // Datos de creacion del documento que se muestran en el PDF
+            $data['_generated_by'] = $adminName;
+            $data['_generated_at'] = $verificationPayload['generated_at'];
+            $data['_report_type']  = $reportType;
+            $data['_generated_file'] = $verificationPayload['filename'];
         }
 
         extract($data);

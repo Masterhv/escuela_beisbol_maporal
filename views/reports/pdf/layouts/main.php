@@ -47,6 +47,15 @@ $pdfCss = file_get_contents(BASE_PATH . 'views/assets/css/pdf.css');
                 <div class="qr-token">Token: <?php echo htmlspecialchars($_token); ?></div>
                 <div class="qr-fingerprint">Huella: <?php echo htmlspecialchars($_fingerprint ?? ''); ?></div>
             </div>
+            <div class="qr-text-cell">
+                <div class="qr-title">Datos de Creaci&#243;n del Documento</div>
+                <div class="qr-desc">
+                    <strong>Tipo de reporte:</strong> <?php echo htmlspecialchars($_report_type ?? ''); ?><br>
+                    <strong>Generado por:</strong> <?php echo htmlspecialchars($_generated_by ?? ''); ?><br>
+                    <strong>Fecha de generaci&#243;n:</strong> <?php echo htmlspecialchars($_generated_at ?? ''); ?><br>
+                    <strong>Archivo:</strong> <?php echo htmlspecialchars($_generated_file ?? ''); ?>
+                </div>
+            </div>
         </div>
         <?php endif; ?>
     </main>
