@@ -400,18 +400,6 @@
                         </div>
                         <p id="account-password-mismatch" class="text-red-500 text-sm mt-1 hidden">Las contrase&ntilde;as no coinciden.</p>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contrase&ntilde;a *</label>
-                        <input
-                            type="password"
-                            name="account_password_confirm"
-                            id="account_password_confirm"
-                            required
-                            minlength="8"
-                            value="<?php echo htmlspecialchars($Athlete['account_password_confirm'] ?? ''); ?>"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-700 focus:border-transparent"
-                        >
-                    </div>
                 </div>
             </div>
             <!-- Información Médica -->
