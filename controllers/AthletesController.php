@@ -428,6 +428,30 @@ class AthletesController extends Controller {
             $result = $this->model->updateAthleteWithStatus($id, $athleteData, $newStatus, $data['status_reason'] ?? '', $this->statusActor());
 
             if ($result['success']) {
+                // Bitacora de la edicion: solo los campos cuyo valor cambio (los cambios de ESTATUS
+                // ya llevan su registro propio con motivo y autor).
+                $labels = [
+                    'first_name' => 'Nombre', 'last_name' => 'Apellido', 'id_card' => 'Cédula del atleta',
+                    'date_of_birth' => 'Fecha de nacimiento', 'category' => 'Categoría', 'jersey_number' => 'Jersey',
+                    'parent_name' => 'Nombre del representante', 'parent_id_card' => 'Cédula del representante',
+                    'parent_phone' => 'Teléfono del representante', 'parent_email' => 'Correo del representante',
+                    'address' => 'Dirección', 'emergency_contact' => 'Contacto de emergencia',
+                    'emergency_phone' => 'Teléfono de emergencia', 'medical_conditions' => 'Condiciones médicas', 'photo' => 'Fotografía',
+                ];
+                $changes = [];
+                foreach ($labels as $field => $label) {
+                    $antes = (string)($Athlete[$field] ?? '');
+                    $despues = (string)($athleteData[$field] ?? '');
+                    if ($antes !== $despues) {
+                        $mostrarAntes = ($field === 'photo' && $antes !== '') ? 'cambiada' : ($antes === '' ? '(vacío)' : $antes);
+                        $changes[] = $label . ': ' . $mostrarAntes . ' → ' . ($despues === '' ? '(vacío)' : $despues);
+                    }
+                }
+                if (empty($changes)) {
+                    $changes[] = 'Sin cambios de datos (solo se re-guardó la ficha)';
+                }
+                $this->model->logAthleteEdit($id, implode(' · ', $changes), $this->statusActor());
+
                 // Reactivar a un atleta con solvencia de retiro: se borran los datos del retiro para no
                 // dejar a un atleta activo con una solvencia vigente. Queda registrado en el log.
                 if ($newStatus === 'active' && !empty($Athlete['withdrawn_at'])) {
@@ -510,8 +534,13 @@ class AthletesController extends Controller {
         $statusDetail = Athlete::statusDetailFor($Athlete, $role);
         $Athlete = Athlete::stripStatusDetailFor($Athlete, $role);
 
+        $athleteLog = in_array(($_SESSION['admin_role'] ?? ''), ['administrador', 'secretario'], true)
+            ? $this->model->getAthleteHistory((int)$id)
+            : [];
+
         $this->view->render('athletes/view', [
             'Athlete' => $Athlete,
+            'athleteLog' => $athleteLog,
             'statusDetail' => $statusDetail,
             'title' => 'Detalles del Atleta'
         ]);

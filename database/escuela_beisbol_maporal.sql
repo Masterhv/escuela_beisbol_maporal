@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-11-2026 a las 11:59:07
+-- Tiempo de generación: 13-11-2026 a las 12:04:33
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -68,6 +68,24 @@ INSERT INTO `admins` (`id`, `username`, `password`, `email`, `id_card`, `birth_d
 --
 -- Estructura de tabla para la tabla `athletes`
 --
+
+--
+-- Estructura de tabla para la tabla `athlete_history`
+--
+
+CREATE TABLE `athlete_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `athlete_id` int(11) NOT NULL,
+  `action` varchar(30) NOT NULL DEFAULT 'update',
+  `changes` varchar(1000) DEFAULT NULL,
+  `actor_id` int(11) DEFAULT NULL,
+  `actor_name` varchar(120) DEFAULT NULL,
+  `actor_role` varchar(20) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_athlete_history` (`athlete_id`,`id`),
+  CONSTRAINT `fk_athlete_history_athlete` FOREIGN KEY (`athlete_id`) REFERENCES `athletes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `athletes` (
   `id` int(11) NOT NULL,

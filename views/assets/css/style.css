@@ -1433,6 +1433,22 @@ table th {
     word-break: break-all;
 }
 .bank-copy-toast--show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Historial de cambios del atleta (bitacora de ediciones, Admin Athlete History Log solo admin/secretario) */
+.athlete-history { list-style: none; margin: 0; padding: 0; max-width: 48rem; }
+.athlete-history__row {
+    border-left: 3px solid #e5e7eb;
+    padding: 0.375rem 0 0.375rem 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.athlete-history__row:last-child { margin-bottom: 0; }
+.athlete-history__meta { font-size: 0.75rem; color: #6b7280; margin-bottom: 0.125rem; }
+.athlete-history__changes { font-size: 0.875rem; color: #374151; }
+@media (prefers-color-scheme: dark) {
+    .athlete-history__row { border-left-color: #374151; }
+    .athlete-history__meta { color: #9ca3af; }
+    .athlete-history__changes { color: #d1d5db; }
+}
 .bank-card__method { margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px dashed #cbd5e1; }
 .bank-card__method-title { margin: 0 0 0.45rem; font-size: 0.82rem; font-weight: 700; color: #8b0000; text-transform: uppercase; letter-spacing: 0.03em; }
 .bank-form__group { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.9rem 1rem 1rem; }

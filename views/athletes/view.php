@@ -299,6 +299,26 @@
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
+            <?php /* Bitácora de ediciones del atleta: solo administrador y secretario */ ?>
+            <?php if (in_array(($_SESSION['admin_role'] ?? ''), ['administrador', 'secretario'], true) && !empty($athleteLog)): ?>
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-history text-gray-500 mr-1"></i>Historial de cambios
+                </label>
+                <ol class="athlete-history">
+                    <?php foreach ($athleteLog as $h): ?>
+                    <li class="athlete-history__row">
+                        <p class="athlete-history__meta">
+                            <?php echo date('d/m/Y H:i', strtotime($h['created_at'])); ?>
+                            · <?php echo htmlspecialchars($h['actor_name']); ?> (<?php echo htmlspecialchars($h['actor_role']); ?>)
+                        </p>
+                        <p class="athlete-history__changes"><?php echo htmlspecialchars($h['changes']); ?></p>
+                    </li>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
+            <?php endif; ?>
+
             </div>
 
             <?php /* Constancia de pertenencia (solo administrador y secretario) */ ?>

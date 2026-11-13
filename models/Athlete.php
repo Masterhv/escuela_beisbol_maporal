@@ -227,6 +227,45 @@ class Athlete extends Model {
      * @param array $data Los nuevos datos del atleta.
      * @return array Un array indicando si la operación fue exitosa.
      */
+    /**
+     * Registra una edicion de datos del atleta en su bitacora (athlete_history): quien, cuando y que cambio.
+     * Los cambios de ESTATUS llevan su propio registro (status_detail) y no se duplican aqui.
+     *
+     * @param int    $athleteId ID del atleta editado.
+     * @param string $changes   Resumen "campo: antes -> despues" en una linea.
+     * @param array  $actor     ['id', 'name', 'role'] de quien edito.
+     * @return bool
+     */
+    public function logAthleteEdit($athleteId, $changes, $actor) {
+        $stmt = $this->db->prepare(
+            "INSERT INTO athlete_history (athlete_id, action, changes, actor_id, actor_name, actor_role)
+             VALUES (:aid, 'update', :ch, :act_id, :act_name, :act_role)"
+        );
+        return $stmt->execute([
+            ':aid' => (int)$athleteId, ':ch' => $changes,
+            ':act_id' => ($actor['id'] ?? null) !== null ? (int)$actor['id'] : null,
+            ':act_name' => (string)($actor['name'] ?? 'desconocido'),
+            ':act_role' => (string)($actor['role'] ?? ''),
+        ]);
+    }
+
+    /**
+     * Devuelve la bitacora de ediciones del atleta, la mas reciente primero.
+     *
+     * @param int $athleteId ID del atleta.
+     * @param int $limit     Cuantas entradas traer.
+     * @return array
+     */
+    public function getAthleteHistory($athleteId, $limit = 20) {
+        $stmt = $this->db->prepare(
+            "SELECT action, changes, actor_name, actor_role, created_at
+             FROM athlete_history WHERE athlete_id = :aid ORDER BY id DESC LIMIT :lim"
+        );
+        $stmt->bindValue(':aid', (int)$athleteId, PDO::PARAM_INT);
+        $stmt->bindValue(':lim', (int)$limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     public function updateAthlete($id, $data) {
         $result = $this->update($id, $data);
         return ['success' => $result];

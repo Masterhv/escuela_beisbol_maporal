@@ -437,12 +437,43 @@ class PaymentWorkflow extends Model {
             "UPDATE payments SET concept_id = :cid, amount = :amt, due_date = :due, month = :month, year = :year, notes = :notes
              WHERE id = :id AND status IN ('pending','rejected')"
         );
-        $stmt->execute([
-            ':cid' => (int)$data['concept_id'], ':amt' => $data['amount'], ':due' => $data['due_date'],
-            ':month' => $data['month'], ':year' => (int)$data['year'], ':notes' => $data['notes'] ?? null,
-            ':id' => (int)$paymentId,
-        ]);
-        return ['ok' => true, 'code' => null, 'error' => null];
+        $txnHere = !$this->db->inTransaction();
+        if ($txnHere) { $this->db->beginTransaction(); }
+        try {
+            $stmt->execute([
+                ':cid' => (int)$data['concept_id'], ':amt' => $data['amount'], ':due' => $data['due_date'],
+                ':month' => $data['month'], ':year' => (int)$data['year'], ':notes' => $data['notes'] ?? null,
+                ':id' => (int)$paymentId,
+            ]);
+
+            // Bitacora: toda edicion de cobro queda registrada (quien, cuando y que quedo).
+            $conceptStmt = $this->db->prepare('SELECT name FROM payment_concepts WHERE id = :cid');
+            $conceptStmt->execute([':cid' => (int)$data['concept_id']]);
+            $conceptName = $conceptStmt->fetchColumn() ?: 'Concepto #' . (int)$data['concept_id'];
+            $comment = 'Cobro actualizado: ' . $conceptName . ' Bs.' . number_format((float)$data['amount'], 2)
+                . ', vence ' . $data['due_date'] . ' (' . $data['month'] . ' ' . (int)$data['year'] . ')';
+            if (trim((string)($data['notes'] ?? '')) !== trim((string)($p['notes'] ?? ''))) {
+                $comment .= ' · Notas modificadas';
+            }
+            $hist = $this->db->prepare(
+                "INSERT INTO payment_history (payment_id, from_status, to_status, action, actor_id, actor_name, actor_role, comment, amount)
+                 VALUES (:pid, :fs_prev, :fs_now, 'update', :aid, :an, :ar, :c, :amt)"
+            );
+            $hist->execute([
+                ':pid' => (int)$paymentId, ':fs_prev' => $p['status'], ':fs_now' => $p['status'],
+                ':aid' => $actor['id'] !== null ? (int)$actor['id'] : null,
+                ':an' => (string)$actor['name'], ':ar' => (string)$actor['role'],
+                ':c' => $comment, ':amt' => $data['amount'],
+            ]);
+
+            if ($txnHere) { $this->db->commit(); }
+            return ['ok' => true, 'code' => null, 'error' => null];
+        } catch (\Throwable $e) {
+            if ($this->db->inTransaction()) { $this->db->rollBack(); }
+            if (!$txnHere) { throw $e; }
+            error_log('[PaymentWorkflow::updateDetails] ' . $e->getMessage());
+            return ['ok' => false, 'code' => 'server_error', 'error' => 'No se pudo actualizar el cobro.'];
+        }
     }
 
     /**

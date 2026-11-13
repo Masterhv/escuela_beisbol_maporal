@@ -29,6 +29,7 @@ $ok  = $_GET['success'] ?? '';
 $actionLabels = [
     'report' => 'Reportó el pago', 'approve' => 'Aprobó el pago', 'reject' => 'Rechazó el pago',
     'reopen' => 'Reabrió el pago', 'create' => 'Generó el cobro', 'migrate' => 'Pago ya cobrado (migración)',
+    'update' => 'Editó el cobro',
 ];
 ?>
 <div class="space-y-6">

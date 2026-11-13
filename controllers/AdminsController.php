@@ -200,6 +200,8 @@ class AdminsController extends Controller {
                 $error = implode('<br>', $errors);
             } else {
                 if ($this->model->update($id, $data)) {
+                    error_log('[AdminsController] cuenta #' . $id . ' (' . $data['username'] . ') actualizada por '
+                        . ($_SESSION['admin_name'] ?? 'desconocido') . ' [rol ' . ($_SESSION['admin_role'] ?? '') . ']');
                     $this->redirect('admins?success=updated');
                 } else {
                     $error = "Error al actualizar el administrador";
