@@ -196,7 +196,8 @@
             </div>
             <?php endforeach; ?>
 
-            <!-- Descargas (disponibles para todos los roles) -->
+            <!-- Descargas: personal de la escuela (el representante las recibe por correo/WhatsApp) -->
+            <?php if (($_SESSION['admin_role'] ?? '') !== 'representante'): ?>
             <div class="mt-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                     <i class="fas fa-download text-gray-500 mr-1"></i>Descargas
@@ -212,6 +213,7 @@
                     </a>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- Retiro y solvencia -->
             <?php

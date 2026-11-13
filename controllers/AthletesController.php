@@ -768,8 +768,10 @@ class AthletesController extends Controller {
      * Ruta: athletes/downloadEnrollmentForm?id=N
      */
     public function downloadEnrollmentForm() {
-        $this->requireAuth();
-
+        // La descarga es solo del personal: el representante recibe su planilla por
+        // correo y WhatsApp (al inscribir al atleta), no desde la vista del sistema.
+        $this->requireRole(['administrador', 'secretario', 'entrenador']);
+        
         $id = $_GET['id'] ?? null;
         if ($id) { $this->requireAthleteAccess($id); }
         if (!$id || !$this->model->findById($id)) {
