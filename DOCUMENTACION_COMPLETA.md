@@ -2329,6 +2329,8 @@ El esquema local quedó desfasado del flujo de pagos (causa de los síntomas del
 
 ### 🛠️ Otros robustecimientos y mejoras
 
+- **Trazabilidad de ediciones**: editar un cobro escribe una fila `update` en la bitácora `payment_history` ("Editó el cobro" con concepto, monto y vencimiento resultantes, y quién lo hizo — nueva tabla no: la bitácora ya existía); editar un **atleta** registra `athlete_history` (tabla nueva, campo por campo: "Jersey: 4 → 5"), visible en el detalle del atleta para administrador y secretario junto a "Estado y retiro". Las ediciones de cuentas dejan rastro en el log del servidor. Los cambios de estatus siguen llevando su registro propio (motivo y autor).
+
 - **Emails/WhatsApp más resistentes**: si falta `config/mail.php`/`config/whatsapp.php` o `vendor/` (caso típico de un clon), `Mailer` y `WhatsAppClient` lanzan una excepción capturable — el aviso se pierde pero la página no queda en blanco y el pago/registro ya guardado se conserva.
 - **Descargas solo para el personal**: el bloque "Descargas" (planilla del atleta y ficha técnica) no se muestra al representante, y `downloadEnrollmentForm` exige rol del personal en el servidor; la ficha técnica ya lo estaba. El representante recibe la planilla por correo/WhatsApp.
 - **Total de Atletas por rol**: la tarjeta usa el conteo global para el personal y, para el representante, solo SUS atletas (el mismo alcance de su lista "Mis Atletas").
