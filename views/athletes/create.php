@@ -848,16 +848,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    [['toggle-account-password', acctPwInput]].forEach(function ([toggleId, input]) {
-        const btnToggle = document.getElementById(toggleId);
-        if (btnToggle && input) {
-            btnToggle.addEventListener('click', function () {
-                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-                input.setAttribute('type', type);
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
-            });
-        }
-    });
+    // Ojo de la contrasena (mismo patron que Administradores -> Nuevo)
+    const toggleAccountPw = document.getElementById('toggle-account-password');
+    if (toggleAccountPw && acctPwInput) {
+        toggleAccountPw.addEventListener('click', function () {
+            const type = acctPwInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            acctPwInput.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    }
 })();
 </script>
