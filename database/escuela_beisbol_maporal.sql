@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-11-2026 a las 13:11:21
+-- Tiempo de generación: 09-11-2026 a las 20:38:21
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -55,10 +55,11 @@ CREATE TABLE `admins` (
 --
 
 INSERT INTO `admins` (`id`, `username`, `password`, `email`, `id_card`, `birth_date`, `phone`, `address`, `emergency_contact_name`, `emergency_contact_relationship`, `emergency_contact_phone`, `full_name`, `role`, `operation_key`, `status`, `created_date`, `last_login`, `updated_at`, `reset_token`, `reset_token_expires_at`) VALUES
-(1, 'admin', '$2y$10$DsLsuKBgNC6i/eat8U0a8ebsUUm0heGOeW1aCoioFxe5TUukQ9yDe', 'beisbolmaporal@gmail.com', '24527809', '1993-04-12', '+584262747945', '1 Diciembre', 'Eurris Velázquez', 'padre', '+584245103144', 'Administrador Principal', 'administrador', '$2y$10$veJzQjPjB5EPP6NoioJPyu5wP1UsveBjU.vScg8ay6Pzufe/lmkHW', 'active', '2025-07-19 12:38:06', '2026-11-09 08:07:57', '2026-11-09 08:07:57', NULL, NULL),
+(1, 'admin', '$2y$10$DsLsuKBgNC6i/eat8U0a8ebsUUm0heGOeW1aCoioFxe5TUukQ9yDe', 'beisbolmaporal@gmail.com', '24527809', '1993-04-12', '+584262747945', '1 Diciembre', 'Eurris Velázquez', 'padre', '+584245103144', 'Administrador Principal', 'administrador', '$2y$10$veJzQjPjB5EPP6NoioJPyu5wP1UsveBjU.vScg8ay6Pzufe/lmkHW', 'active', '2025-07-19 12:38:06', '2026-11-09 15:30:45', '2026-11-09 15:30:45', NULL, NULL),
 (2, 'valeromh', '$2y$10$UUxFXWeUA.pTzPEd0t87W.925RYMOZfckdkF3.1Pn4/l697h615Rq', 'valeromh@pdvsa.com.ve', '11324654', '1969-12-05', '0424-5852482', 'Urb. Ciudad Tavacare, Sector B, Bloque 8, Apartamento 3', 'Milangela de Valero', 'Esposa', '0414-1321316', 'Miguel Alejandro Valero Piedra', 'administrador', '$2y$10$2Sl0dv5HbX6rV0tEfGKvBObzV.KWhTpITTZdz4c1LsbPWlHQBi5Xq', 'active', '2025-11-17 22:53:24', '2026-06-29 22:39:40', '2026-10-29 20:38:05', NULL, NULL),
 (147, 'rattiae', '$2y$10$l98h3d8EIcw5H8yATVlKweXZJ0H3lHTXrXj.y23Z6fxhIVbCj.oPy', 'rattiae@gmail.com', '13216548', '1960-08-12', '0414-1234567', 'Raúl Leoni', 'Luis Rojas', 'sobrino', '0422-1234567', 'Edita Rattia de Escobar', 'representante', NULL, 'active', '2026-11-09 07:08:10', '2026-11-09 07:17:36', '2026-11-09 07:17:36', NULL, NULL),
-(148, 'serranosv', '$2y$10$BuwbOFKrErvbBXwPjsQutOd4/271eWEf/hYCRYOE/dwtDyf.3cER2', 'serranosv@pdvsa.com.ve', '18244234', '1980-10-11', '0416-2783977', 'Raul Leoni', 'Yadi de Serrano', 'Pareja', '0414-3223234', 'Silvanny Serrano', 'secretario', NULL, 'active', '2026-11-09 07:41:01', '2026-11-09 07:41:22', '2026-11-09 07:41:22', NULL, NULL);
+(148, 'serranosv', '$2y$10$BuwbOFKrErvbBXwPjsQutOd4/271eWEf/hYCRYOE/dwtDyf.3cER2', 'serranosv@pdvsa.com.ve', '18244234', '1980-10-11', '0416-2783977', 'Raul Leoni', 'Yadi de Serrano', 'Pareja', '0414-3223234', 'Silvanny Serrano', 'secretario', NULL, 'active', '2026-11-09 07:41:01', '2026-11-09 07:41:22', '2026-11-09 07:41:22', NULL, NULL),
+(149, 'piconr', '$2y$10$f2caHlOzDbGpi5H2zazEs.MP4OVFpTbxOOTwed98eBQb17f.vNY8e', 'ingpiconrolando@gmail.com', '19997839', '1991-10-12', '0414-7199654', 'Av Arismendi', 'Carlos Gutierrez', 'Primo', '0424-1339657', 'Rolando Picón', 'representante', NULL, 'active', '2026-11-09 14:35:57', '2026-11-09 15:07:59', '2026-11-09 15:07:59', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -115,7 +116,8 @@ INSERT INTO `athletes` (`id`, `first_name`, `last_name`, `id_card`, `date_of_bir
 (14, 'Andrés', 'Ramirez', NULL, '2016-05-18', 9, 'Gonzalo Ramírez', '14654123', '0416-4564213', 'ramirezg@gmail.com', 'Terrazas de Santo Domingo', 'María de Ramírez', '0422-2342343', 'no', '2025-11-16', 'Infantil', 'active', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 16:52:28', '2026-10-29 20:35:58'),
 (15, 'Carlos', 'Zambrano', NULL, '2014-06-15', 11, 'Héctor Zambrano', '15321654', '0424-6549879', 'zambranoh@gmail.com', 'Palacio Fajardo, calle principal. casa H-12', 'Mario Zuñiga', '0414-3333333', 'no', '2025-11-16', 'Pre-juvenil', 'active', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 4, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 16:54:59', '2025-11-16 16:54:59'),
 (16, 'Anderson', 'Galindez', NULL, '2017-09-15', 9, 'José Galíndez', '14021313', '0416-9876546', 'Galindezj@gmail.com', 'Terracota, Calle 4, Casa 12', 'Fabian Mendez', '0416-3344442', 'no', '2025-11-16', 'Infantil', 'suspended', 'se mudó de Ciudad', '2026-11-08 17:02:56', 1, 'Administrador Principal', 'administrador', NULL, NULL, NULL, 3, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 16:57:20', '2026-11-08 17:02:56'),
-(17, 'Roberto', 'Santiago', NULL, '2008-12-09', 17, 'María Teresa', '9846543', '0416-5554644', 'teresam@gmail.com', 'Urb, Santo Domingo, calle 12, casa 15', 'Hugo Santiago', '0414-9554154', 'no', '2025-11-16', 'Junior', 'inactive', 'Falta disciplinaria', '2026-11-08 17:04:02', 1, 'Administrador Principal', 'administrador', NULL, NULL, NULL, 7, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 17:00:38', '2026-11-08 17:04:02');
+(17, 'Roberto', 'Santiago', NULL, '2008-12-09', 17, 'María Teresa', '9846543', '0416-5554644', 'teresam@gmail.com', 'Urb, Santo Domingo, calle 12, casa 15', 'Hugo Santiago', '0414-9554154', 'no', '2025-11-16', 'Junior', 'inactive', 'Falta disciplinaria', '2026-11-08 17:04:02', 1, 'Administrador Principal', 'administrador', NULL, NULL, NULL, 7, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 17:00:38', '2026-11-08 17:04:02'),
+(87, 'Dylan Josue', 'Picón Rodriguez', '33465242', '2013-06-06', 13, 'Rolando Picón', '19997839', '0414-7199654', 'ingpiconrolando@gmail.com', 'Av. Arismendi', 'Carlos Gutierrez', '0424-1339657', 'Ninguno', '2026-11-09', 'Juvenil', 'active', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 5, 'img/atleta_6af2064de7b73_1794246221.jpg', 'sent', '2026-11-09 13:43:45', NULL, 'sent', '2026-11-09 13:43:50', NULL, '2026-11-09 13:43:41', '2026-11-09 13:43:50');
 
 -- --------------------------------------------------------
 
@@ -267,7 +269,13 @@ INSERT INTO `payments` (`id`, `athlete_id`, `concept_id`, `athlete_name`, `amoun
 (3, 13, 1, '', 10000.00, NULL, NULL, '2025-12-16', NULL, 'pending', 'Noviembre', 2025, 'referencia 9541', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 17:40:06', '2026-10-29 19:18:55'),
 (4, 14, 1, '', 10000.00, NULL, NULL, '2025-12-16', '2025-11-16', 'approved', 'Noviembre', 2025, 'numero de referencia 6520', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 21:14:36', '2026-10-29 19:18:55'),
 (5, 14, 1, '', 10000.00, NULL, NULL, '2026-01-16', '2025-11-16', 'approved', 'Diciembre', 2025, 'pago por adelantado de Diciembre, número de referencia 6895', NULL, NULL, NULL, NULL, NULL, 'img/comprobantes/comprobante_6a3cb2f5b8c16_1782362869.png', 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2025-11-16 21:16:55', '2026-10-29 19:18:55'),
-(206, 12, 1, '', 10000.00, '01010101010101010101', 'transferencia', '2026-12-09', '2026-11-09', 'in_review', 'Noviembre', 2026, '', 147, '2026-11-09 07:18:17', NULL, NULL, NULL, 'img/comprobantes/comprobante_a240d42fb39048ea_1794223097.jpg', 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 07:10:09', '2026-11-09 07:18:17');
+(206, 12, 1, '', 10000.00, '01010101010101010101', 'transferencia', '2026-12-09', '2026-11-09', 'in_review', 'Noviembre', 2026, '', 147, '2026-11-09 07:18:17', NULL, NULL, NULL, 'img/comprobantes/comprobante_a240d42fb39048ea_1794223097.jpg', 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 07:10:09', '2026-11-09 07:18:17'),
+(213, 87, 2, '', 30000.00, NULL, NULL, '2026-11-16', NULL, 'pending', 'Noviembre', 2026, 'Generado automaticamente al inscribir al atleta.', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 13:43:41', '2026-11-09 13:43:41'),
+(214, 87, 1, '', 10000.00, NULL, NULL, '2026-12-09', NULL, 'pending', 'Noviembre', 2026, 'Generado automaticamente al inscribir al atleta.', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 13:43:41', '2026-11-09 13:43:41'),
+(215, 87, 1, '', 10000.00, NULL, NULL, '2027-01-09', NULL, 'pending', 'Diciembre', 2026, 'Generado automaticamente al inscribir al atleta.', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 13:43:41', '2026-11-09 13:43:41'),
+(216, 87, 1, '', 10000.00, NULL, NULL, '2027-02-09', NULL, 'pending', 'Enero', 2027, 'Generado automaticamente al inscribir al atleta.', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 13:43:41', '2026-11-09 13:43:41'),
+(217, 87, 1, '', 10000.00, NULL, NULL, '2027-03-09', NULL, 'pending', 'Febrero', 2027, 'Generado automaticamente al inscribir al atleta.', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 13:43:41', '2026-11-09 13:43:41'),
+(218, 87, 1, '', 10000.00, NULL, NULL, '2027-04-09', NULL, 'pending', 'Marzo', 2027, 'Generado automaticamente al inscribir al atleta.', NULL, NULL, NULL, NULL, NULL, NULL, 'not_sent', NULL, NULL, 'not_sent', NULL, NULL, '2026-11-09 13:43:41', '2026-11-09 13:43:41');
 
 -- --------------------------------------------------------
 
@@ -325,7 +333,13 @@ INSERT INTO `payment_history` (`id`, `payment_id`, `from_status`, `to_status`, `
 (2, 4, 'paid', 'approved', 'migrate', NULL, 'Migracion del sistema', 'sistema', 'Pago ya cobrado antes del flujo de verificacion; aprobador original no registrado.', 10000.00, '2026-10-29 19:18:55'),
 (3, 5, 'paid', 'approved', 'migrate', NULL, 'Migracion del sistema', 'sistema', 'Pago ya cobrado antes del flujo de verificacion; aprobador original no registrado.', 10000.00, '2026-10-29 19:18:55'),
 (71, 206, NULL, 'pending', 'create', 1, 'Administrador Principal', 'administrador', 'Cobro generado.', 10000.00, '2026-11-09 07:10:09'),
-(72, 206, 'pending', 'in_review', 'report', 147, 'Edita Rattia de Escobar', 'representante', NULL, 10000.00, '2026-11-09 07:18:17');
+(72, 206, 'pending', 'in_review', 'report', 147, 'Edita Rattia de Escobar', 'representante', NULL, 10000.00, '2026-11-09 07:18:17'),
+(79, 213, NULL, 'pending', 'create', 1, 'Administrador Principal', 'administrador', 'Cobro generado por el plan de inscripcion.', 30000.00, '2026-11-09 13:43:41'),
+(80, 214, NULL, 'pending', 'create', 1, 'Administrador Principal', 'administrador', 'Cobro generado por el plan de inscripcion.', 10000.00, '2026-11-09 13:43:41'),
+(81, 215, NULL, 'pending', 'create', 1, 'Administrador Principal', 'administrador', 'Cobro generado por el plan de inscripcion.', 10000.00, '2026-11-09 13:43:41'),
+(82, 216, NULL, 'pending', 'create', 1, 'Administrador Principal', 'administrador', 'Cobro generado por el plan de inscripcion.', 10000.00, '2026-11-09 13:43:41'),
+(83, 217, NULL, 'pending', 'create', 1, 'Administrador Principal', 'administrador', 'Cobro generado por el plan de inscripcion.', 10000.00, '2026-11-09 13:43:41'),
+(84, 218, NULL, 'pending', 'create', 1, 'Administrador Principal', 'administrador', 'Cobro generado por el plan de inscripcion.', 10000.00, '2026-11-09 13:43:41');
 
 -- --------------------------------------------------------
 
@@ -406,7 +420,8 @@ INSERT INTO `pdf_verifications` (`id`, `token`, `report_type`, `filename`, `gene
 (260, 'c005ee7bde8b22026d96685891a0d3cfcaf23cc2dbb49525d12ebfa41ad9f78e', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 1, 'Administrador Principal', '5934fbc01d60d70518e02777874570ebdc76e07d81cdc8a991565a6f7cfe3469', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:28:12\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:28:12', 0, NULL),
 (261, 'bb590a2934465afaa98647b3f989e7a8589c3697bedf89792111ad44441ba335', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 1, 'Administrador Principal', '241f171af0fede3ccf67e143f7c9dfcca9427b430dc58e63291229c72226b02e', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:28:48\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:28:48', 0, NULL),
 (262, '223c43753a42f68d03ef9a0433302820a87f68c7a961cba08521bf55520dd073', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 1, 'Administrador Principal', '1b975015255f946bb3a03a3d9fa1f438e061fe080bb6471b1aa18349218ecd65', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:35:31\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:35:31', 0, NULL),
-(263, 'c9436b0b9c94a5e249f4b2f8cc731cd801d2475339782492b97065eb434d54d3', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 148, 'Silvanny Serrano', '23aaac60136a76d0f33a208b39b59d4f9edb99892a70f5e0a4cbd8bb66a7066e', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:42:08\",\"generated_by\":\"Silvanny Serrano\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:42:08', 0, NULL);
+(263, 'c9436b0b9c94a5e249f4b2f8cc731cd801d2475339782492b97065eb434d54d3', 'payment_history', 'Historial_de_Pago_Ricardo_Escobar.pdf', 148, 'Silvanny Serrano', '23aaac60136a76d0f33a208b39b59d4f9edb99892a70f5e0a4cbd8bb66a7066e', '{\"athlete_name\":\"Ricardo Escobar\",\"athlete_id_card\":31654321,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Edita Rattia de Escobar\",\"total_payments\":2,\"total_amount\":\"10,000.00\",\"generated_at\":\"09/11/2026 07:42:08\",\"generated_by\":\"Silvanny Serrano\",\"filename\":\"Historial_de_Pago_Ricardo_Escobar.pdf\",\"report_type\":\"payment_history\"}', '2026-11-09 07:42:08', 0, NULL),
+(264, '730cf10bb5962f32d237909c5484b828682231807777ae98ec4b59d4db368671', 'enrollment_form', 'Planilla_Inscripcion_Dylan_Josue_Pic_n_Rodriguez_87.pdf', 1, 'Administrador Principal', '293b4656df31b9f64161edf1e32980e3a6bde9e261e905675530d75291393edb', '{\"athlete_name\":\"Dylan Josue Picón Rodriguez\",\"athlete_id_card\":33465242,\"athlete_category\":\"Juvenil\",\"parent_name\":\"Rolando Picón\",\"registration_date\":\"2026-11-09\",\"generated_at\":\"09/11/2026 13:43:41\",\"generated_by\":\"Administrador Principal\",\"filename\":\"Planilla_Inscripcion_Dylan_Josue_Pic_n_Rodriguez_87.pdf\",\"report_type\":\"enrollment_form\"}', '2026-11-09 13:43:41', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -478,8 +493,9 @@ CREATE TABLE `send_counters` (
 
 INSERT INTO `send_counters` (`channel`, `day`, `used`) VALUES
 ('email', '2026-10-29', 1),
-('email', '2026-11-09', 2),
-('whatsapp', '2026-10-29', 1);
+('email', '2026-11-09', 3),
+('whatsapp', '2026-10-29', 1),
+('whatsapp', '2026-11-09', 1);
 
 -- --------------------------------------------------------
 
@@ -505,7 +521,9 @@ INSERT INTO `send_log` (`id`, `channel`, `purpose`, `status`, `recipient_hash`, 
 (110, 'email', 'document', 'sent', 'f440db56877d3e7f', NULL, '2026-10-29 23:09:59'),
 (111, 'whatsapp', 'whatsapp', 'sent', 'e95acccaa3b2652c', NULL, '2026-10-29 23:10:03'),
 (112, 'email', 'notification', 'sent', 'f440db56877d3e7f', NULL, '2026-11-09 07:18:18'),
-(113, 'email', 'notification', 'sent', '6d30eac4f1a9f576', NULL, '2026-11-09 07:18:20');
+(113, 'email', 'notification', 'sent', '6d30eac4f1a9f576', NULL, '2026-11-09 07:18:20'),
+(114, 'email', 'document', 'sent', '7b872d0d86d5601a', NULL, '2026-11-09 13:43:42'),
+(115, 'whatsapp', 'whatsapp', 'sent', '85f40408018ad566', NULL, '2026-11-09 13:43:47');
 
 -- --------------------------------------------------------
 
@@ -772,13 +790,13 @@ ALTER TABLE `training_sessions`
 -- AUTO_INCREMENT de la tabla `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=149;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=150;
 
 --
 -- AUTO_INCREMENT de la tabla `athletes`
 --
 ALTER TABLE `athletes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT de la tabla `inventory_items`
@@ -802,7 +820,7 @@ ALTER TABLE `membership_certificates`
 -- AUTO_INCREMENT de la tabla `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=213;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=219;
 
 --
 -- AUTO_INCREMENT de la tabla `payment_concepts`
@@ -814,13 +832,13 @@ ALTER TABLE `payment_concepts`
 -- AUTO_INCREMENT de la tabla `payment_history`
 --
 ALTER TABLE `payment_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT de la tabla `pdf_verifications`
 --
 ALTER TABLE `pdf_verifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=264;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=265;
 
 --
 -- AUTO_INCREMENT de la tabla `school_bank_account_history`
@@ -832,7 +850,7 @@ ALTER TABLE `school_bank_account_history`
 -- AUTO_INCREMENT de la tabla `send_log`
 --
 ALTER TABLE `send_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
 
 --
 -- AUTO_INCREMENT de la tabla `tournaments`
